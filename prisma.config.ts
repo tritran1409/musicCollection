@@ -7,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: "mongodb+srv://seven007:Seven007@cluster0.grysdc2.mongodb.net/music_collection?retryWrites=true&w=majority",
+    url: "mongodb+srv://seven007:seven007@poaap.f0mxo.mongodb.net/music_collection?retryWrites=true&w=majority",
   },
 });

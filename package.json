@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=development react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "create-admin": "node scripts/admin.js"
+    "create-admin": "tsx scripts/admin.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",
@@ -32,7 +32,9 @@
     "@types/react-dom": "^19.1.9",
     "cross-env": "^10.1.0",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4"
   }

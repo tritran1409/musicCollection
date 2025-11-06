@@ -11,7 +11,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb+srv://seven007:Seven007@cluster0.grysdc2.mongodb.net/music_collection?retryWrites=true&w=majority"
+  url      = "mongodb+srv://seven007:seven007@poaap.f0mxo.mongodb.net/music_collection?retryWrites=true&w=majority"
 }
 model User {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -27,4 +27,14 @@ enum Role {
   TEACHER
   STUDENT
   CONTRIBUTOR
+}
+model File {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  filename   String
+  url        String
+  mimeType   String
+  size       Int
+  ownerId    String?  @db.ObjectId
+  lessonId   String?  @db.ObjectId
+  createdAt  DateTime @default(now())
 }
