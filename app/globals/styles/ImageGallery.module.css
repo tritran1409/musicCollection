@@ -180,5 +180,172 @@
   justify-content: space-between;
   align-items: center;
 }
+.addBtn {
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.addBtn:hover {
+  background: #1e40af;
+}
+.modalFooter {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+.modalFooter .submitBtn {
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 70px;
+}
+
+.select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.success {
+  color: #16a34a;
+  font-size: 14px;
+}
+.multiSelect {
+  position: relative;
+  cursor: pointer;
+}
+
+.inputBox {
+  min-height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.placeholder {
+  color: #888;
+  font-size: 14px;
+}
+
+.tag {
+  background: #2563eb;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.dropdownItem {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.dropdownItem:hover {
+  background: #f3f4f6;
+}
+
+.dropdownItem.selected {
+  background: #e0e7ff;
+}
+.input,
+.textarea,
+.select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+  outline: none; /* bỏ outline khi focus */
+  transition: border 0.2s ease;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  border-color: #2563eb; /* highlight border khi focus */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); /* nhẹ shadow cho trực quan */
+}
+.button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.button:hover {
+  background: #1e40af;
+}
+
+.button:disabled {
+  background: #9ca3af; /* xám nhạt */
+  cursor: not-allowed;
+  color: #f3f4f6;
+}
+
+.button:disabled:hover {
+  background: #9ca3af; /* không đổi khi hover */
+}
+
+
 
 

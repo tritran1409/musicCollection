@@ -1,97 +1,105 @@
-.input {
-  display: none;
-}
-
 .wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  width: 100%;
 }
 
 .dropZone {
-  width: 220px;
-  height: 180px;
-  border: 2px dashed #d1d5db;
+  width: 100%;
+  max-width: 320px;
+  height: 200px;
+  border: 2px dashed #ccc;
   border-radius: 12px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #fafafa;
+  color: #666;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: border-color 0.2s, background 0.2s;
   position: relative;
-  text-align: center;
+  overflow: hidden;
+  background: #fafafa;
 }
 
 .dropZone:hover {
-  border-color: #818cf8;
-  background: #f9fafb;
+  border-color: #4f46e5;
+  background: #f4f4ff;
 }
 
-.icon {
-  font-size: 2rem;
-  color: #6366f1;
-  margin-bottom: 0.2rem; /* giảm bớt khoảng cách để cân */
-  line-height: 1; /* giúp icon và text canh giữa chuẩn */
+.previewBox {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.text {
-  color: #6b7280;
-  font-size: 0.85rem;
-  margin-top: 0.2rem;
+  height: 100%;
+  width: 100%;
 }
 
 .media {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 12px;
 }
 
-.audioPreview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 1.4rem;
-}
-
-.fileIcon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #4b5563;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.bigIcon {
+.icon {
   font-size: 2rem;
-  margin-bottom: 0.4rem;
+  color: #4f46e5;
+}
+
+.text {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.input {
+  display: none;
 }
 
 .fileInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 220px;
-  font-size: 0.85rem;
-  color: #374151;
-  background: #f3f4f6;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
+  background: #f1f3f5;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 320px;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 .removeBtn {
-  background: none;
   border: none;
-  cursor: pointer;
-  color: #ef4444;
+  background: transparent;
+  color: #999;
   font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.removeBtn:hover {
+  color: #e11d48;
+}
+
+.audioPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fileIcon {
+  text-align: center;
+  color: #444;
+}
+
+.bigIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
 }

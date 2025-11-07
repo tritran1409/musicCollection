@@ -1,78 +1,86 @@
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.45);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 50;
+  justify-content: center;
+  z-index: 999;
 }
 
 .modal {
-  background: #fff;
+  background: white;
   border-radius: 12px;
-  width: 100%;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.25s ease;
 }
 
 .header {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #eee;
 }
 
 .header h3 {
   margin: 0;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #111827;
+  color: #333;
 }
 
 .closeBtn {
-  background: none;
+  background: transparent;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #6b7280;
-  transition: color 0.2s ease;
+  color: #666;
 }
 
-.closeBtn:hover {
-  color: #111827;
-}
-
-.body {
-  padding: 1.25rem;
-  flex: 1;
-  overflow-y: auto;
+.content {
+  padding: 1rem 1.25rem;
 }
 
 .footer {
-  padding: 0.8rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  background-color: #fafafa;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #eee;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.cancelBtn {
+  background: #e5e7eb;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #d1d5db;
+}
+
+.submitBtn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submitBtn:hover {
+  background: #4338ca;
+}
+
+.submitBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
