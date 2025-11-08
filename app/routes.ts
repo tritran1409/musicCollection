@@ -4,7 +4,7 @@ export default [
     index("routes/home.tsx"),
     route("dashboard", "routes/Dashboard.jsx",[
         route("class/:class/lectures", "routes/dashboard/lessons.jsx"),
-        route("class/:class/videos", "routes/media.jsx"),
+        route("class/:class/:file_type", "routes/media.jsx"),
     ]),
     layout("layouts/authen/Authen.jsx", [
         route("login", "routes/Login.jsx"),

@@ -9,13 +9,16 @@ export class FileModel extends BaseModel {
     this.cloudinaryRepo = new CloudinaryRepo();
   }
 
-  async uploadFileToCloudinary(file, folder = "general", userId = null) {
+  async uploadFileToCloudinary(file, folder = "general", userId = null, extraData = {}) {
+    const originalFilename = file.name;
     const result = await this.cloudinaryRepo.upload(file, folder);
     if (!result) throw new Error("Upload file thất bại");
-    
     return this.createFile({
-      filename: result.original_filename,
+      filename: originalFilename,
       url: result.secure_url,
+      name: extraData?.name,
+      description: extraData?.description,
+      classes: extraData?.classes || [],
       type: result.resource_type,
       size: result.bytes,
       src: 'cloudinary',

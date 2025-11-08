@@ -1,16 +1,27 @@
+import { FileText, Music } from "lucide-react";
+import { useState } from "react";
 import { useLoaderData } from "react-router";
 import { FileModel } from "../.server/fileUpload.repo.js";
-import styles from "../globals/styles/ImageGallery.module.css";
+import ClassSelector from "../components/common/ClassSelector.jsx";
 import FileUploader from "../components/common/FileUploader.jsx";
-import { FileText, Video, Music, Image as ImageIcon } from "lucide-react";
 import Modal from "../components/modals/upload/Modal.jsx";
-import { useState, useRef } from "react";
+import styles from "../globals/styles/ImageGallery.module.css";
 import useUpload from "../hooks/useUpload.js";
-import useOutsideClick from "../hooks/useOutsideClick.js";
 const fileModel = new FileModel();
+const typeMap = {
+  videos: "video",
+  audios: "audio",
+  images: "image",
+  documents: "raw",
+};
 
-export async function loader() {
-  const files = await fileModel.findAll();
+export async function loader({params}) {
+  let fileType = params.file_type;
+  let classMate = params.class;
+  const query = {};
+  if (fileType) query.type = typeMap[fileType];
+  if (classMate) query.classes = { has: Number(classMate) };
+  const files = await fileModel.findAll(query);
   return Response.json({ files });
 }
 
@@ -20,29 +31,21 @@ export default function FileLibraryPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
-  const [classes, setClasses] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [classes, setClasses] = useState([1]);
   const { upload, loading, error, data } = useUpload();
   const handleUpload = () => {
     if (!selectedFile) return;
-    upload(selectedFile, "/upload/images");
+    upload(selectedFile, "/upload/videos", {
+      name,
+      description,
+      classes: JSON.stringify(classes)
+    });
   };
   const handleFileSelectd = (file) => {
     setSelectedFile(file);
     setModalOpen(true);
   };
-  const allClasses = Array.from({ length: 12 }, (_, i) => `Lớp ${i + 1}`);
 
-  const toggleClass = (cls) => {
-    if (classes.includes(cls)) {
-      setClasses(classes.filter((c) => c !== cls));
-    } else {
-      setClasses([...classes, cls]);
-    }
-  };
-  const dropdownRef = useRef(null);
-
-useOutsideClick(dropdownRef, () => setDropdownOpen(false));
   const getFilePreview = (file) => {
     const type = (file.type || "").toLowerCase();
 
@@ -91,7 +94,6 @@ useOutsideClick(dropdownRef, () => setDropdownOpen(false));
     setName("");
     setDescription("");
     setClasses([]);
-    setDropdownOpen(false);
   };
   return (
     <div className={styles.container}>
@@ -136,7 +138,7 @@ useOutsideClick(dropdownRef, () => setDropdownOpen(false));
           <div className={styles.form}>
             <FileUploader
               onFileSelect={handleFileSelectd}
-              accept="image/*,video/*,audio/*,application/*"
+              accept="video/*"
             />
 
             <div className={styles.field}>
@@ -160,47 +162,11 @@ useOutsideClick(dropdownRef, () => setDropdownOpen(false));
               />
             </div>
 
-            <div className={styles.field}>
-              <label>Lớp học</label>
-              <div className={styles.multiSelect} ref={dropdownRef}>
-                <div
-                  className={styles.inputBox}
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                >
-                  {classes.length === 0 ? (
-                    <span className={styles.placeholder}>Chọn lớp...</span>
-                  ) : (
-                    classes.map((cls) => (
-                      <span
-                        key={cls}
-                        className={styles.tag}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleClass(cls);
-                        }}
-                      >
-                        {cls} ✕
-                      </span>
-                    ))
-                  )}
-                </div>
-                {dropdownOpen && (
-                  <div className={styles.dropdown}>
-                    {allClasses.map((cls) => (
-                      <div
-                        key={cls}
-                        className={`${styles.dropdownItem} ${
-                          classes.includes(cls) ? styles.selected : ""
-                        }`}
-                        onClick={() => toggleClass(cls)}
-                      >
-                        {cls}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <ClassSelector
+              selected={classes}
+              onChange={setClasses}
+              fixedClasses={[1]}
+            />
 
             {error && <p className={styles.error}>{error}</p>}
             {data?.success && <p className={styles.success}>Tải lên thành công!</p>}
