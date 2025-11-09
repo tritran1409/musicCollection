@@ -31,7 +31,9 @@ enum Role {
 model File {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   filename   String
+  publicId   String?
   url        String
+  downloadUrl String?
   type       String
   size       Int
   src        String?

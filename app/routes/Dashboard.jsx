@@ -14,6 +14,7 @@ export async function loader({ request }) {
     { id: "lectures", name: "📚 Bài giảng", files: [], children: [] },
     { id: "videos", name: "🎬 Video", files: [], children: [] },
     { id: "images", name: "🖼️ Hình ảnh", files: [], children: [] },
+    { id: "audios", name: "🎧 Âm thanh", files: [], children: [] },
     { id: "documents", name: "📄 Tài liệu", files: [], children: [] },
   ];
 
@@ -40,6 +41,7 @@ export async function loader({ request }) {
             { id: "suu-tam-am-nhac", name: "Âm nhạc" },
             { id: "suu-tam-hinh-anh", name: "Hình ảnh" },
             { id: "suu-tam-video", name: "Video" },
+            { id: "suu-tam-audio", name: "Âm thanh" },
             { id: "suu-tam-tai-lieu", name: "Tài liệu" },
         ],
   },

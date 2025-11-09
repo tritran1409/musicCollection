@@ -11,15 +11,23 @@ export class FileModel extends BaseModel {
 
   async uploadFileToCloudinary(file, folder = "general", userId = null, extraData = {}) {
     const originalFilename = file.name;
+    const fileType = file.type;
+    let customType = null;
+    if (fileType === 'application/pdf') {
+      customType = 'raw';
+    }
     const result = await this.cloudinaryRepo.upload(file, folder);
     if (!result) throw new Error("Upload file thất bại");
+    const url = this.cloudinaryRepo.publicIdToUrl(result.public_id, result.resource_type, result.format);
     return this.createFile({
       filename: originalFilename,
-      url: result.secure_url,
+      url: result.url,
+      publicId: result.public_id,
+      downloadUrl: url,
       name: extraData?.name,
       description: extraData?.description,
       classes: extraData?.classes || [],
-      type: result.resource_type,
+      type: customType || result.resource_type,
       size: result.bytes,
       src: 'cloudinary',
       detail: result,

@@ -203,7 +203,7 @@ function TreeNodeLower({ node, collapseSignal, selectedId, setSelectedId }) {
 
   const hasChildren = node.children && node.children.length > 0;
   // hide folder icon for these categories per your request
-  const hideFolderIcon = ["bài giảng", "video", "hình ảnh", "tài liệu"].some((k) =>
+  const hideFolderIcon = ["bài giảng", "video", "hình ảnh", "âm thanh", "tài liệu"].some((k) =>
     node.name.toLowerCase().includes(k)
   );
 

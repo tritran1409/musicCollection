@@ -67,13 +67,49 @@
 
 .meta {
   margin-top: 0.5rem;
+   padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .filename {
-  display: block;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #374151;
-  word-break: break-word;
+  color: #333;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  position: relative;
+  cursor: default;
+}
+
+/* Tooltip khi hover */
+.filename::after {
+  content: attr(data-fullname);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 10;
+}
+
+.filename:hover::after {
+  opacity: 1;
 }
 
 .size {
@@ -147,7 +183,8 @@
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  overflow: hidden;
+  /* overflow: hidden; */
+  position: relative;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
@@ -345,6 +382,44 @@
 .button:disabled:hover {
   background: #9ca3af; /* không đổi khi hover */
 }
+/* Ẩn nút hành động khi chưa hover */
+.actions {
+  display: none;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.downloadBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.downloadBtn:hover {
+  background: #1e40af;
+}
+.fileInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+/* Khi hover card, ẩn info và hiện actions */
+.card:hover .fileInfo {
+  display: none;
+}
+
+.card:hover .actions {
+  display: flex;
+}
+
 
 
 

@@ -7,6 +7,7 @@ import FileUploader from "../components/common/FileUploader.jsx";
 import Modal from "../components/modals/upload/Modal.jsx";
 import styles from "../globals/styles/ImageGallery.module.css";
 import useUpload from "../hooks/useUpload.js";
+import { redirect } from "react-router";
 const fileModel = new FileModel();
 const typeMap = {
   videos: "video",
@@ -14,31 +15,40 @@ const typeMap = {
   images: "image",
   documents: "raw",
 };
+const acceptMap = {
+  videos: "video/*",
+  audios: "audio/*",
+  images: "image/*",
+  documents: ".txt, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .pdf",
+};
 
 export async function loader({params}) {
   let fileType = params.file_type;
   let classMate = params.class;
+  if (!["videos", "audios", "images", "documents"].includes(fileType)) {
+    return redirect("/dashboard");
+  }
   const query = {};
   if (fileType) query.type = typeMap[fileType];
   if (classMate) query.classes = { has: Number(classMate) };
   const files = await fileModel.findAll(query);
-  return Response.json({ files });
+  return Response.json({ files, fileType, classMate });
 }
 
 export default function FileLibraryPage() {
-  const { files } = useLoaderData();
+  const { files, fileType, classMate } = useLoaderData();
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
-  const [classes, setClasses] = useState([1]);
+  const [classes, setClasses] = useState(classMate?[Number(classMate)]:[]);
   const { upload, loading, error, data } = useUpload();
   const handleUpload = () => {
     if (!selectedFile) return;
     upload(selectedFile, "/upload/videos", {
       name,
       description,
-      classes: JSON.stringify(classes)
+      classes: JSON.stringify(classMate?[Number(classMate)]:[])
     });
   };
   const handleFileSelectd = (file) => {
@@ -93,7 +103,6 @@ export default function FileLibraryPage() {
     setSelectedFile(null);
     setName("");
     setDescription("");
-    setClasses([]);
   };
   return (
     <div className={styles.container}>
@@ -105,16 +114,28 @@ export default function FileLibraryPage() {
         {files.length === 0 ? (
           <p className={styles.empty}>Chưa có tệp nào được tải lên</p>
         ) : (
-          <div className={styles.grid}>
-            {files.map((file) => (
-              <div key={file.id} className={styles.card}>
-                {getFilePreview(file)}
-                <div className={styles.meta}>
-                  <span className={styles.filename}>{file.filename}</span>
-                  <span className={styles.size}>
-                    {(file.size / 1024).toFixed(1)} KB
-                  </span>
-                  <span className={styles.typeTag}>{file.type}</span>
+            <div className={styles.grid}>
+              {files.map((file) => (
+                <div key={file.id} className={styles.card}>
+                  {getFilePreview(file)}
+                  <div className={styles.meta}>
+                    <div className={styles.fileInfo}>
+                      <span className={styles.filename}>{file.filename}</span>
+                      <span className={styles.typeTag}>{file.type}</span>
+                    </div>
+
+                    <div className={styles.actions}>
+                      {
+                        file.downloadUrl && (
+                          <button
+                            className={styles.downloadBtn}
+                            onClick={() => window.open(file.downloadUrl, "_blank")}
+                          >
+                            ⬇️
+                          </button>
+                        )
+                      }
+                    </div>
                 </div>
               </div>
             ))}
@@ -138,7 +159,7 @@ export default function FileLibraryPage() {
           <div className={styles.form}>
             <FileUploader
               onFileSelect={handleFileSelectd}
-              accept="video/*"
+              accept={acceptMap[fileType] || "*/*"}
             />
 
             <div className={styles.field}>
