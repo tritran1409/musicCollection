@@ -1,4 +1,4 @@
-import { BaseModel } from "./base";
+import { BaseModel } from "./base.repo";
 
 export class UserModel extends BaseModel {
   constructor() {
@@ -16,6 +16,10 @@ export class UserModel extends BaseModel {
       where: { role: "TEACHER" },
     });
   }
-}
 
-export const userModel = new UserModel();
+  async findById(id) {
+    return this.model.findUnique({
+      where: { id },
+    });
+  }
+}

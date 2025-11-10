@@ -42,5 +42,6 @@ model File {
   description String?
   classes    Int[] @default([])
   ownerId    String?  @db.ObjectId
+  ownerName    String?
   createdAt  DateTime @default(now())
 }

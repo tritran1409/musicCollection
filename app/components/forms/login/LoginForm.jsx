@@ -13,7 +13,7 @@ export async function action({ request }) {
     return { error: "Email hoặc mật khẩu không đúng", status: 400 };
   }
 
-  return redirect("/dashboard");
+  return redirect("/bang-dieu-khien");
 }
 
 export default function LoginPage() {

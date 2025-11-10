@@ -1,9 +1,9 @@
+import { Outlet, redirect } from "react-router";
+import { TreeSidebar } from "../components/folderTree/FolderTree";
 import Header from "../components/header/Header";
-import Sidebar from "../components/sidebar/SideBar";
 import styles from "../globals/styles/main.module.css";
-import { Outlet } from "react-router";
 import { getUser } from "../service/auth.server";
-import { redirect } from "react-router";
+import { menuData } from "../utils/menuData";
 
 export async function loader({ request }) {
     const user = await getUser(request);
@@ -20,11 +20,11 @@ export async function loader({ request }) {
 
   // Tạo danh sách lớp 1 → 12
   const classes = Array.from({ length: 12 }, (_, i) => ({
-    id: `class-${i + 1}`,
+    id: `${i + 1}`,
     name: `Lớp ${i + 1}`,
     children: classChildren.map((item) => ({
       ...item,
-      id: `${i + 1}/${item.id}`,
+      id: `class/${i + 1}/${item.id}`,
     })),
   }));
 
@@ -47,19 +47,20 @@ export async function loader({ request }) {
   },
   ];
 
-  return { user, treeData };
+  return { user };
 }
 
 
 export default function Dashboard({ loaderData }) {
-  const { user, treeData } = loaderData;
-
+  const { user } = loaderData;
+  console.log(menuData);
+  
   return (
     <div className={styles.dashboard}>
       <Header user={user} />
 
       <div className={styles.layout}>
-        <Sidebar treeData={treeData} />
+        <TreeSidebar menuData={menuData} />
 
         <main className={styles.main}>
           <Outlet />

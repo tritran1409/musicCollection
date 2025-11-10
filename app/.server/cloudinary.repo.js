@@ -3,29 +3,42 @@ import cloudinary from "../utils/cloudinary.server";
 import { sanitizeFileName } from "../helper/texthelper";
 
 export class CloudinaryRepo {
-    async upload(file, folder = "general") {
+  async upload(file, folder = "general") {
     if (!file || typeof file === "string") throw new Error("File không hợp lệ");
 
     const buffer = Buffer.from(await file.arrayBuffer());
     let resourceType = "auto";
-    if (file.type.startsWith("image/")) resourceType = "image";
-    else if (file.type.startsWith("video/")) resourceType = "video";
-    else resourceType = "raw";
-    const filename = sanitizeFileName(file.name);
-    if (filename.includes(".pdf")) {
-      resourceType = "auto";
+    
+    if (file.type.startsWith("image/")) {
+      resourceType = "image";
+    } else if (file.type.startsWith("video/")) {
+      resourceType = "video";
+    } else {
+      resourceType = "raw";
     }
     
     const uploadStream = () =>
       new Promise((resolve, reject) => {
+        const data = {
+          folder: `mcollection/${folder}`,
+          resource_type: resourceType,
+        };
+        
+        let filename = sanitizeFileName(file.name);
+        if (resourceType === "raw") {
+          // For documents: remove extension, let Cloudinary handle it
+          filename = filename.replace(/\.[^.]+$/, '');
+          data.public_id = filename;
+          data.overwrite = true;
+        } else {
+          // For images/videos: keep it simple, let Cloudinary auto-handle
+          data.use_filename = true;
+          data.unique_filename = false;
+          data.filename = filename;
+        }
+        
         const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: `mcollection/${folder}`,
-            resource_type: resourceType,
-            use_filename: true,
-            unique_filename: false,
-            filename: filename,
-          },
+          data,
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -35,7 +48,6 @@ export class CloudinaryRepo {
       });
 
     const result = await uploadStream();
-
     return result;
   }
 
@@ -44,14 +56,17 @@ export class CloudinaryRepo {
     return { success: true };
   }
 
-  publicIdToUrl(publicId, resourceType = "auto", format = null) {
-    const data = {
+  publicIdToUrl(publicId, resourceType = "auto") {
+    return cloudinary.url(publicId, {
       resource_type: resourceType,
       secure: true,
-    }
-    // if (format) data.format = format;
-    // if (data.format) data.resource_type = "raw";
-    return cloudinary.url(publicId, data);
+    });
+  }
+  
+  publicIdToDownloadUrl(publicId, resourceType = "auto") {
+    return cloudinary.url(publicId, {
+      resource_type: resourceType,
+      secure: true,
+    });
   }
 }
-    

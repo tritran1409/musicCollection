@@ -1,10 +1,9 @@
 import { type RouteConfig, index, layout, route } from "@react-router/dev/routes";
-
 export default [
     index("routes/home.tsx"),
-    route("dashboard", "routes/Dashboard.jsx",[
-        route("class/:class/lectures", "routes/dashboard/lessons.jsx"),
-        route("class/:class/:file_type", "routes/media.jsx"),
+    route("/bang-dieu-khien", "routes/Dashboard.jsx",[
+        route(`chuong-trinh-hoc/bai-giang/:class`, "routes/dashboard/lessons.jsx"),
+        route(`chuong-trinh-hoc/:class/:file_type`, "routes/media.jsx"),
     ]),
     layout("layouts/authen/Authen.jsx", [
         route("login", "routes/Login.jsx"),

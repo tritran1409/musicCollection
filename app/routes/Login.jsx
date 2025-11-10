@@ -4,7 +4,7 @@ import { redirect } from "react-router";
 
 export async function loader({ request }) {
   let user = await getUser(request);
-  if (user) throw redirect("/dashboard");
+  if (user) throw redirect("/bang-dieu-khien");
   return null;
 }
 
@@ -16,7 +16,7 @@ export async function action({ request }) {
   try {
     const { headers, user } = await login(email, password);
 
-    return redirect("/dashboard", { headers });
+    return redirect("/bang-dieu-khien", { headers });
   } catch (err) {
     return {
       error: err.message || "Email hoặc mật khẩu không đúng",
