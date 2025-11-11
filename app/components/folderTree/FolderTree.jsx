@@ -1,19 +1,24 @@
-// app/components/TreeSidebar.jsx
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router';
-import { ChevronRight, ChevronDown, Folder, File } from 'lucide-react';
-import styles from './FolderTree.module.css';
+import { AddCategoryModal } from "./modal/AddCategoryModal";
+import styles from "./FolderTree.module.css";
+import { useState } from "react";
+import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { Link, useFetcher } from "react-router";
+import { EditCategoryModal } from "./modal/EditCategoryModal";
+import { DeleteCategoryModal } from "./modal/DeleteCategoryModal";
 
-const TreeItem = ({ item, level = 0 }) => {
+const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = null }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
-  console.log(item);
+  const canAddCategory = item.custom === true;
   
-  // Kiểm tra active state
-  const isActive = location.pathname === item.path || 
-    (hasChildren && item.children.some(child => 
-      location.pathname.startsWith(child.path)
+  const isOwner = item.ownerId === user?.id;
+  const fetcher = useFetcher();
+  const isActive = currentPath === item.path ||
+    (hasChildren && item.children.some(child =>
+      currentPath.startsWith(child.path)
     ));
 
   const toggleOpen = (e) => {
@@ -24,6 +29,62 @@ const TreeItem = ({ item, level = 0 }) => {
     }
   };
 
+  const handleAddClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsModalOpen(true);
+  };
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDeleteModalOpen(true);
+  };
+  const handleCategorySubmit = (name) => {
+    if (name.trim()) {
+      const formData = new FormData();
+      formData.append("intent", "create");
+      formData.append("name", name.trim());
+
+      fetcher.submit(formData, {
+        method: "post",
+        action: "/api/category",
+      });
+    }
+  };
+  const handleEditSubmit = (name) => {
+    if (name.trim()) {
+      console.log(item, name);
+      
+      const formData = new FormData();
+      formData.append("intent", "update");
+      formData.append("id", item.id);
+      formData.append("name", name.trim());
+
+      fetcher.submit(formData, {
+        method: "post",
+        action: "/api/category",
+      });
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    const formData = new FormData();
+    formData.append("intent", "delete");
+    formData.append("id", item.id);
+
+    fetcher.submit(formData, {
+      method: "post",
+      action: "/api/category",
+    });
+
+    setIsDeleteModalOpen(false);
+  };
   const ItemContent = () => (
     <div
       className={`${styles.itemContent} ${isActive && !hasChildren ? styles.active : ''}`}
@@ -35,162 +96,168 @@ const TreeItem = ({ item, level = 0 }) => {
         </span>
       )}
       {!hasChildren && <span className={styles.spacer} />}
-      
+
       <span className={styles.icon}>
-        {item.icon || (hasChildren ? <Folder size={18} /> : <File size={18} />)}
+        {item.icon}
       </span>
-      
+
       <span className={styles.label}>{item.label}</span>
+      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        {isOwner && item.edit && (
+          <>
+            <button
+              onClick={handleEditClick}
+              style={{
+                padding: '4px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                color: '#666'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#e0e0e0';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              title="Chỉnh sửa"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              style={{
+                padding: '4px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                color: '#666'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ffebee';
+                e.currentTarget.style.color = '#dc3545';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#666';
+              }}
+              title="Xóa"
+            >
+              <Trash2 size={14} />
+            </button>
+          </>
+        )}
+
+        {canAddCategory && (
+          <button
+            onClick={handleAddClick}
+            style={{
+              padding: '4px',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#666'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#e0e0e0';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+            title="Thêm category"
+          >
+            <Plus size={14} />
+          </button>
+        )}
+      </div>
     </div>
   );
 
   return (
-    <div>
-      {hasChildren ? (
-        <div onClick={toggleOpen} className={styles.clickable}>
-          <ItemContent />
-        </div>
-      ) : (
-        <Link to={item.path} prefetch="intent" className={styles.link}>
-          <ItemContent />
-        </Link>
-      )}
-      
-      {hasChildren && isOpen && (
-        <div className={styles.children}>
-          {item.children.map((child, index) => (
-            <TreeItem key={child.path || index} item={child} level={level + 1} />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <div>
+        {hasChildren ? (
+          <div onClick={toggleOpen} className={styles.clickable}>
+            <ItemContent />
+          </div>
+        ) : (
+          <Link to={item.path} prefetch="intent" className="link">
+            <ItemContent />
+          </Link>
+        )}
+
+        {hasChildren && isOpen && (
+          <div className={styles.children}>
+            {item.children.map((child, index) => (
+              <TreeItem
+                key={child.id || child.path || index}
+                item={child}
+                level={level + 1}
+                onCategoryAdd={onCategoryAdd}
+                currentPath={currentPath}
+                user={user}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <AddCategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        parentLabel={item.label}
+        onSubmit={handleCategorySubmit}
+      />
+      <EditCategoryModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentName={item.label}
+        onSubmit={handleEditSubmit}
+      />
+
+      <DeleteCategoryModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        categoryName={item.label}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 };
 
-export const TreeSidebar = ({ menuData, title = 'Navigation' }) => {
+// Main TreeSidebar Component
+export const TreeSidebar = ({
+  menuData,
+  title = 'Navigation',
+  currentPath = '/',
+  onCategoryAdd,
+  user = null
+}) => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.container}>
         <h2 className={styles.title}>{title}</h2>
         <nav className={styles.nav}>
           {menuData.map((item, index) => (
-            <TreeItem key={item.path || index} item={item} />
+            <TreeItem
+              key={item.id || item.path || index}
+              item={item}
+              onCategoryAdd={onCategoryAdd}
+              currentPath={currentPath}
+              user={user}
+            />
           ))}
         </nav>
       </div>
     </aside>
   );
 };
-
-// Example: app/data/menuData.js
-
-
-/* ==========================================
-   app/components/TreeSidebar.module.css
-   ========================================== */
-
-/*
-.sidebar {
-  width: 256px;
-  height: 100vh;
-  background-color: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  overflow-y: auto;
-}
-
-.container {
-  padding: 1rem;
-}
-
-.title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 1rem;
-}
-
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.itemContent {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
-  color: #374151;
-  cursor: pointer;
-}
-
-.itemContent:hover {
-  background-color: #f3f4f6;
-}
-
-.itemContent.active {
-  background-color: #3b82f6;
-  color: #ffffff;
-}
-
-.chevron {
-  flex-shrink: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.spacer {
-  width: 16px;
-  flex-shrink: 0;
-}
-
-.icon {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.label {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.clickable {
-  cursor: pointer;
-}
-
-.link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.children {
-  margin-top: 0.25rem;
-}
-*/
-
-/* ==========================================
-   Example: app/routes/_layout.jsx
-   ========================================== */
-
-/*
-import { Outlet } from '@remix-run/react';
-import { TreeSidebar } from '~/components/TreeSidebar';
-import { menuData } from '~/data/menuData';
-
-export default function Layout() {
-  return (
-    <div style={{ display: 'flex' }}>
-      <TreeSidebar menuData={menuData} />
-      <main style={{ flex: 1, padding: '2rem', backgroundColor: '#f9fafb' }}>
-        <Outlet />
-      </main>
-    </div>
-  );
-}
-*/

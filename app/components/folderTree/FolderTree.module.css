@@ -32,6 +32,7 @@
   transition: all 0.2s;
   color: #374151;
   cursor: pointer;
+  position: relative;
 }
 
 .itemContent:hover {
@@ -79,4 +80,30 @@
 
 .children {
   margin-top: 0.25rem;
+}
+
+.addButton {
+  padding: 0.25rem;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  color: #6b7280;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.addButton:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.itemContent.active .addButton {
+  color: #ffffff;
+}
+
+.itemContent.active .addButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }

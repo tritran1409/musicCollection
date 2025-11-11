@@ -8,7 +8,7 @@ import ClassSelector from "./ClassSelector.jsx";
 import FileUploader from "./FileUploader.jsx";
 import useUpdateFile from "../../hooks/useUpload.js";
 
-export default function FileLibraryPage({ files, fileType = "raw", classMate = null, accept = "*/*" }) {
+export default function FileLibraryPage({ files, fileType = "raw", classMate = null, accept = "*/*", category = null }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [clickedFile, setClickedFile] = useState(null);
@@ -21,11 +21,13 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
 
   const handleUpload = () => {
     if (!selectedFile) return;
-    upload(selectedFile, `/upload/${fileType}`, {
+    const dataUpload = {
       name,
       description,
       classes: JSON.stringify(classMate ? [Number(classMate)] : [])
-    });
+    };
+    if (category) dataUpload.category = category;
+    upload(selectedFile, `/upload/${fileType}`, dataUpload);
   };
 
   const handleDownload = async (file) => {

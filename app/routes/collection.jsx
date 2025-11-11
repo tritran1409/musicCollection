@@ -25,7 +25,6 @@ const viTypemap = {
 export async function loader({ params }) {
   let fileType = params.file_type;
   fileType = viTypemap[fileType];
-  let classMate = params.class;
   if (!["videos", "audios", "images", "documents"].includes(fileType)) {
     return redirect("/bang-dieu-khien");
   }

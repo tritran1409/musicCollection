@@ -40,8 +40,20 @@ model File {
   detail     Json?
   name       String?
   description String?
+  category   String?  @db.ObjectId
   classes    Int[] @default([])
   ownerId    String?  @db.ObjectId
   ownerName    String?
   createdAt  DateTime @default(now())
 }
+
+model Category {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String    @unique
+  description String?
+  ownerId    String?  @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+

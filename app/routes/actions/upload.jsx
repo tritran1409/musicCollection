@@ -8,11 +8,13 @@ export const action = async ({ request, params }) => {
     const classes = formData.get("classes") || "[]";
     const name = formData.get("name");
     const description = formData.get("description");
+    const category = formData.get("category");
     const extraData = {
       name,
       description,
       classes: JSON.parse(classes),
     };
+    if (category) extraData.category = category;
     const folder = params.path || "general";
     let user = await getUser(request);
     const fieldModel = new FileModel();

@@ -26,10 +26,8 @@ export class FileModel extends BaseModel {
     // Use secure_url from Cloudinary
     const url = result.secure_url;
     const downloadUrl = result.secure_url;
-    console.log(user);
-    
-    return this.createFile({
-      filename: originalFilename, // Keep original filename
+    const dataUpdate = {
+      filename: originalFilename,
       url: url,
       publicId: result.public_id,
       downloadUrl: downloadUrl,
@@ -42,7 +40,9 @@ export class FileModel extends BaseModel {
       detail: result,
       ownerId: userId,
       ownerName: user.name,
-    });
+    }
+    if (extraData?.category) dataUpdate.category = extraData.category;
+    return this.createFile(dataUpdate);
   }
 
   async findByLesson(lessonId) {
