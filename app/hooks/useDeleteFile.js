@@ -1,33 +1,26 @@
 import { useFetcher } from "react-router";
 import { useCallback, useMemo, useState } from "react";
 
-export default function useUpload() {
+export default function useDeleteFile() {
   const fetcher = useFetcher();
   const [error, setError] = useState(null);
 
-  const upload = useCallback(
-    async (file, url, extraData = {}) => {
-      if (!file || !url) {
-        setError("Thiếu file hoặc upload URL");
+  const deleteFile = useCallback(
+    async (fileId) => {
+      if (!fileId) {
+        setError("Thiếu dữ liệu hoặc ID file để xóa");
         return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      for (const key in extraData) {
-        formData.append(key, extraData[key]);
       }
 
       try {
         setError(null);
-        fetcher.submit(formData, {
+        fetcher.submit({id: fileId}, {
           method: "post",
-          action: url,
-          encType: "multipart/form-data",
+          action: "/deleteFile",
+          encType: "application/json",
         });
       } catch (err) {
-        console.error("Upload failed:", err);
+        console.error("Delete failed:", err);
         setError(err.message);
       }
     },
@@ -43,5 +36,5 @@ export default function useUpload() {
     [fetcher.state, fetcher.data, error]
   );
 
-  return { upload, ...state };
+  return { deleteFile, ...state };
 }

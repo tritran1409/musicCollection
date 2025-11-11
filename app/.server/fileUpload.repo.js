@@ -68,5 +68,9 @@ export class FileModel extends BaseModel {
     if (data.id) delete data.id;
     return this.model.update({ where: { id: fileId }, data });
   }
+  async deleteFile(fileId) {
+    if (!fileId) throw new Error("File ID is required");
+    return this.model.delete({ where: { id: fileId } });
+  }
 }
 export default FileModel;

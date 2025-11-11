@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { Link, useFetcher } from "react-router";
 import { EditCategoryModal } from "./modal/EditCategoryModal";
-import { DeleteCategoryModal } from "./modal/DeleteCategoryModal";
+import { DeleteModal } from "./modal/DeleteModal";
 
 const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = null }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,7 +88,7 @@ const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = nul
   const ItemContent = () => (
     <div
       className={`${styles.itemContent} ${isActive && !hasChildren ? styles.active : ''}`}
-      style={{ paddingLeft: `${level * 16 + 12}px` }}
+      style={{ paddingLeft: `${level * 12 + 8}px` }}
     >
       {hasChildren && (
         <span onClick={toggleOpen} className={styles.chevron}>
@@ -224,10 +224,11 @@ const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = nul
         onSubmit={handleEditSubmit}
       />
 
-      <DeleteCategoryModal
+      <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        categoryName={item.label}
+        title="Xóa danh mục"
+        message={<p>Bạn có chắc chắn muốn xóa danh mục <strong>{item.label}</strong>?</p>}
         onConfirm={handleDeleteConfirm}
       />
     </>

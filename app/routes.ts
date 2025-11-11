@@ -14,5 +14,6 @@ export default [
     route("logout", "routes/actions/logout.jsx"),
     route("upload/:path", "routes/actions/upload.jsx"),
     route("updateFile", "routes/actions/updateFile.jsx"),
+    route("deleteFile", "routes/actions/deleteFile.jsx"),
     route("api/category", "routes/actions/category.jsx"),
 ] satisfies RouteConfig;

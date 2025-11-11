@@ -1,13 +1,13 @@
 import { Modal } from "../../modal/Modal";
 
-export const DeleteCategoryModal = ({ isOpen, onClose, categoryName, onConfirm }) => {
+export const DeleteModal = ({ isOpen, onClose, title, message, onConfirm }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#dc3545' }}>
-        Xóa danh mục
+        {title}
       </h3>
       <p style={{ marginBottom: '24px' }}>
-        Bạn có chắc chắn muốn xóa danh mục "<strong>{categoryName}</strong>"?
+        {message}
       </p>
       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
         <button

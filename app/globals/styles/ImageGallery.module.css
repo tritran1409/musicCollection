@@ -237,7 +237,22 @@
   background: #1e40af;
   cursor: pointer;
 }
+.deleteBtn   {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: #dc2626;
+  color: #fff;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
 
+.deleteBtn:hover {
+  background: #991b1b;
+  cursor: pointer;
+}
 /* =============================
  🧩 FORM MODAL
 ============================= */
@@ -310,6 +325,31 @@
 
 .sideActions {
   display: flex;
+  gap: 0.5rem;
   justify-content: flex-end;
   margin-bottom: 1rem;
+}
+.miniActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+.saveBtn {
+  color: #2563eb;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.cancelBtn {
+  color: #dc2626;
+  font-weight: 400;
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.25s;
 }

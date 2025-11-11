@@ -28,7 +28,7 @@ export const menuData = [
   {
     label: 'Chương trình học',
     path: '/chuong-trinh-hoc',
-    icon: '👥',
+    icon: '🎓',
     custom: false,
     edit: false,
     children: generateGradeMenuData()

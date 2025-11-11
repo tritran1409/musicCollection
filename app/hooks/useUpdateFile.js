@@ -26,6 +26,27 @@ export default function useUpdateFile() {
     },
     [fetcher]
   );
+  const deleteFile = useCallback(
+    async (fileId) => {
+      if (!fileId) {
+        setError("Thiếu dữ liệu hoặc ID file để xóa");
+        return;
+      }
+
+      try {
+        setError(null);
+        fetcher.submit({id: fileId}, {
+          method: "post",
+          action: "/deleteFile",
+          encType: "application/json",
+        });
+      } catch (err) {
+        console.error("Delete failed:", err);
+        setError(err.message);
+      }
+    },
+    [fetcher]
+  );
 
   const state = useMemo(
     () => ({
@@ -36,5 +57,5 @@ export default function useUpdateFile() {
     [fetcher.state, fetcher.data, error]
   );
 
-  return { updateFile, ...state };
+  return { updateFile, deleteFile, ...state };
 }

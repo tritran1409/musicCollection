@@ -16,7 +16,7 @@ export async function loader({ request }) {
     {
       label: 'Sưu tập',
       path: '/suu-tap',
-      icon: '👥',
+      icon: '🗂️',
       custom: true,
       edit: false,
       children: [
@@ -28,7 +28,7 @@ export async function loader({ request }) {
           id: category.id,
           slug: category.slug,
           ownerId: category.ownerId,
-          icon: '📁',
+          icon: '🗃️',
           label: category.name,
           path: `/bang-dieu-khien/tuy-chinh/${category.slug}`,
           edit: true,
