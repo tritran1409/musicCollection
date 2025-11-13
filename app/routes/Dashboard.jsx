@@ -5,6 +5,7 @@ import styles from "../globals/styles/main.module.css";
 import { getUser } from "../service/auth.server";
 import { menuData } from "../utils/menuData";
 import { CategoryModel } from "../.server/category.repo";
+import { CategoryProvider } from "../context/CategoryContext";
 
 export async function loader({ request }) {
   const user = await getUser(request);
@@ -36,24 +37,26 @@ export async function loader({ request }) {
       ]
     }
   ];
-  return { user, menuList };
+  return { user, menuList, customCategories };
 }
 
 
 export default function Dashboard({ loaderData }) {
-  const { user, menuList } = loaderData;
+  const { user, menuList, customCategories } = loaderData;
 
   return (
-    <div className={styles.dashboard}>
-      <Header user={user} />
+    <CategoryProvider customCategories={customCategories}>
+      <div className={styles.dashboard}>
+        <Header user={user} />
 
-      <div className={styles.layout}>
-        <TreeSidebar menuData={menuList} user={user} />
+        <div className={styles.layout}>
+          <TreeSidebar menuData={menuList} user={user} />
 
-        <main className={styles.main}>
-          <Outlet />
-        </main>
+          <main className={styles.main}>
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </CategoryProvider>
   );
 }

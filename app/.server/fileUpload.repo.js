@@ -89,7 +89,6 @@ export class FileModel extends BaseModel {
       }
 
       // Date range filter
-      console.log(filters, "filters1");
       
       if (filters.dateFrom || filters.dateTo) {
         where.createdAt = {};

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Filter, Calendar, FileType, User, GraduationCap } from 'lucide-react';
+import { useCategories } from '../../context/CategoryContext';
 
 export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilters = [] }) => {
   const [filters, setFilters] = useState({
     search: '',
     types: [], // Thay đổi từ type sang types (array)
     classes: [], // Thêm filter lớp
+    category: '',
     dateFrom: '',
     dateTo: '',
     ownerName: '',
@@ -16,6 +18,11 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
   const isFirstRender = useRef(true);
   const isDisabled = (field) => disabledFilters.includes(field);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { customCategories } = useCategories();
+  const categories = (customCategories || []).map((category) => ({
+    value: category.slug,
+    label: category.name,
+  }));
 
   // File types phổ biến
   const fileTypes = [
@@ -93,6 +100,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
     return filters.search !== '' ||
       filters.types.length > 0 ||
       filters.classes.length > 0 ||
+      filters.category !== '' ||
       filters.dateFrom !== '' ||
       filters.dateTo !== '' ||
       filters.ownerName !== '' ||
@@ -105,6 +113,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
     if (filters.search) count++;
     if (filters.types.length > 0) count++;
     if (filters.classes.length > 0) count++;
+    if (filters.category) count++;
     if (filters.dateFrom) count++;
     if (filters.dateTo) count++;
     if (filters.ownerName) count++;
@@ -243,8 +252,26 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
               />
             </div>
-
-            {/* Từ ngày */}
+            {/* Danh mục */}
+            <div className="w-48">
+              <label className="text-xs font-medium text-gray-700 mb-1.5 block">
+                Danh mục sưu tầm
+              </label>
+              <select
+                value={filters.category}
+                onChange={(e) => handleChange('category', e.target.value)}
+                disabled={isDisabled('category')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-white"
+              >
+                <option value="">-- Tất cả --</option>
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            { }
             <div className="w-40">
               <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-1.5">
                 <Calendar className="w-3.5 h-3.5" />
@@ -371,6 +398,16 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
                       onClick={() => handleChange('dateTo', '')}
                       className="hover:bg-indigo-200 rounded-full p-0.5"
                     >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </span>
+              )}
+              {filters.category && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-pink-100 text-pink-700 rounded-full text-xs">
+                  Danh mục: {categories.find(c => c.value === filters.category)?.label}
+                  {!isDisabled('category') && (
+                    <button onClick={() => handleChange('category', '')} className="hover:bg-pink-200 rounded-full p-0.5">
                       <X className="w-3 h-3" />
                     </button>
                   )}

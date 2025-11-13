@@ -22,6 +22,13 @@ const viTypemap = {
     "video": "videos",
     "bai-giang": "lectures",
 }
+const viNameMap = {
+    "audios": "âm thanh",
+    "images": "hình ảnh",
+    "documents": "tài liệu",
+    "videos": "video",
+    "lectures": "bài giảng",
+}
 export async function loader({ params }) {
   let fileType = params.file_type;
   fileType = viTypemap[fileType];
@@ -36,5 +43,6 @@ export async function loader({ params }) {
 
 export default function FileLibraryPage() {
   const { files, fileType } = useLoaderData();
-  return <FileLibraryLayout files={files} fileType={fileType} accept={acceptMap[fileType]} />;
+  const pageName = `📁 Sưu tập ${viNameMap[fileType]}`;
+  return <FileLibraryLayout files={files} fileType={fileType} accept={acceptMap[fileType]} pageName={pageName} />;
 }

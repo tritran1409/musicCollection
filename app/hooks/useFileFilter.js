@@ -1,5 +1,5 @@
 import { useFetcher } from 'react-router';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function useFilter(
   initialData = null, 
@@ -9,6 +9,14 @@ export default function useFilter(
   initialFilters = {}
 ) {
   const fetcher = useFetcher();
+  const [hasFetched, setHasFetched] = useState(false);
+  const initialDataRef = useRef(initialData);
+  useEffect(() => {
+    if (initialData !== initialDataRef.current) {
+      setHasFetched(false);
+      initialDataRef.current = initialData;
+    }
+  }, [initialData]);
   const [activeFilters, setActiveFilters] = useState({
     search: initialFilters.search || '',
     types: initialFilters.types || [], // Changed to array
@@ -18,13 +26,17 @@ export default function useFilter(
     owner: initialFilters.owner || '',
     category: initialFilters.category || '',
   });
+  console.log(activeFilters,'activeFilters', initialData);
+  
   const [pagination, setPagination] = useState({
     page: initialPage,
     limit: initialLimit,
   });
   const preFilters = useRef(activeFilters);
   // Determine data source: fetcher data or initial data
-  const data = fetcher.data || initialData;
+  const data = hasFetched ? (fetcher.data || initialData) : initialData;
+  console.log(hasFetched, 'has', data);
+  
   const isLoading = fetcher.state !== 'idle';
 
   // Submit filter request to server với pagination
@@ -33,6 +45,8 @@ export default function useFilter(
       console.warn('No endpoint provided for filter');
       return;
     }
+    console.log(filters,'filters');
+    setHasFetched(true); 
     const newFilters = {
       ...activeFilters,
       ...filters
@@ -49,6 +63,15 @@ export default function useFilter(
     }
 
     // Gửi request lên server
+    console.log({
+        intent: 'filter',
+        ...newFilters,
+        page: newPagination.page,
+        limit: newPagination.limit,
+        classes: JSON.stringify(newFilters.classes),
+        types: JSON.stringify(newFilters.types),
+      });
+    
     fetcher.submit(
       {
         intent: 'filter',
@@ -77,6 +100,7 @@ export default function useFilter(
         page,
         limit: pagination.limit,
         classes: JSON.stringify(activeFilters.classes),
+        types: JSON.stringify(activeFilters.types),
       },
       {
         method: 'post',
@@ -97,6 +121,7 @@ export default function useFilter(
         page: 1,
         limit,
         classes: JSON.stringify(activeFilters.classes),
+        types: JSON.stringify(activeFilters.types),
       },
       {
         method: 'post',
@@ -126,7 +151,7 @@ export default function useFilter(
 
     const emptyFilters = {
       search: '',
-      types: '',
+      types: [],
       classes: [],
       dateFrom: null,
       dateTo: null,
@@ -143,6 +168,7 @@ export default function useFilter(
         page: 1,
         limit: pagination.limit,
         classes: JSON.stringify([]),
+        types: JSON.stringify([]),
       },
       {
         method: 'post',
@@ -154,7 +180,7 @@ export default function useFilter(
   // Check if any filter is active
   const hasActiveFilters = () => {
     return activeFilters.search !== '' ||
-           activeFilters.types.length > 0 ||
+           (activeFilters.types && activeFilters.types.length > 0) ||
            (activeFilters.classes && activeFilters.classes.length > 0) ||
            activeFilters.dateFrom !== null ||
            activeFilters.dateTo !== null ||
@@ -168,7 +194,8 @@ export default function useFilter(
   const hasPreviousPage = pagination.page > 1;
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
   const endIndex = Math.min(pagination.page * pagination.limit, data?.total || 0);
-
+  console.log(data,'data');
+  
   return {
     filter,
     resetFilters,

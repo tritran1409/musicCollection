@@ -28,6 +28,8 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
   const [isEdit, setIsEdit] = useState(false);
   const { loading: updateLoading, error: updateError, data: updateData, updateFile, deleteFile } = useUpdateFile();
   const { upload, loading, error, data } = useUpload();
+  console.log(files, 'files');
+  
   const initFilterGenerator = useMemo(() => {
   let temp = {};
   if (classMate) temp.classes = [Number(classMate)];
@@ -38,6 +40,8 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
   }
   return temp;
 }, [classMate, fileType]);
+  console.log(initFilterGenerator, 'initFilterGenerator');
+  
   const { 
     filterResult, 
     filtering, 
@@ -50,7 +54,8 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     resetFilters,
     activeFilters,
   } = useFilter(files, '/api/filterFile', 1, 20, initFilterGenerator);
-  console.log(files, filterResult);
+  console.log(filterResult, 'filterResult');
+  
   
   const handleUpload = () => {
     if (!selectedFile) return;
