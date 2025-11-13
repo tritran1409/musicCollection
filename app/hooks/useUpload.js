@@ -1,12 +1,11 @@
-import { useFetcher } from "react-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFetcherWithReset } from "./useFetcherWithReset";
 
 export default function useUpload() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
   const [error, setError] = useState(null);
 
-  const upload = useCallback(
-    async (file, url, extraData = {}) => {
+  const upload = async (file, url, extraData = {}) => {
       if (!file || !url) {
         setError("Thiếu file hoặc upload URL");
         return;
@@ -30,9 +29,7 @@ export default function useUpload() {
         console.error("Upload failed:", err);
         setError(err.message);
       }
-    },
-    [fetcher]
-  );
+    }
 
   const state = useMemo(
     () => ({
@@ -42,6 +39,11 @@ export default function useUpload() {
     }),
     [fetcher.state, fetcher.data, error]
   );
+  useEffect(() => {
+    if (fetcher.data) {
+      fetcher.reset();
+    }
+  }, [fetcher.data]);
 
   return { upload, ...state };
 }

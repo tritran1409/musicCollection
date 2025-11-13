@@ -1,8 +1,8 @@
-import { useFetcher } from "react-router";
-import { useCallback, useMemo, useState } from "react";
+import { useFetcherWithReset } from "./useFetcherWithReset";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function useDeleteFile() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
   const [error, setError] = useState(null);
 
   const deleteFile = useCallback(
@@ -35,6 +35,11 @@ export default function useDeleteFile() {
     }),
     [fetcher.state, fetcher.data, error]
   );
+  useEffect(() => {
+    if (fetcher.data) {
+      fetcher.reset();
+    }
+  }, [fetcher.data]);
 
   return { deleteFile, ...state };
 }

@@ -1,211 +1,189 @@
-import { useFetcher } from 'react-router';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from "react";
+import { useFetcherWithReset } from "./useFetcherWithReset";
+import { deepEqual } from "../helper/dataHelper";
 
 export default function useFilter(
-  initialData = null, 
-  endpoint = null, 
-  initialPage = 1, 
+  initialData = null,
+  endpoint = null,
+  initialPage = 1,
   initialLimit = 20,
   initialFilters = {}
 ) {
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
   const [hasFetched, setHasFetched] = useState(false);
-  const initialDataRef = useRef(initialData);
-  useEffect(() => {
-    if (initialData !== initialDataRef.current) {
-      setHasFetched(false);
-      initialDataRef.current = initialData;
-    }
-  }, [initialData]);
+
+  // initData là bản gốc (loader)
+  const [initData, setInitData] = useState(initialData);
+
+  // data là bản hiển thị (sẽ cập nhật khi fetcher có dữ liệu mới)
+  const [data, setData] = useState(initialData);
+
   const [activeFilters, setActiveFilters] = useState({
-    search: initialFilters.search || '',
-    types: initialFilters.types || [], // Changed to array
+    search: initialFilters.search || "",
+    types: initialFilters.types || [],
     classes: initialFilters.classes || [],
     dateFrom: initialFilters.dateFrom || null,
     dateTo: initialFilters.dateTo || null,
-    owner: initialFilters.owner || '',
-    category: initialFilters.category || '',
+    owner: initialFilters.owner || "",
+    category: initialFilters.category || "",
   });
-  console.log(activeFilters,'activeFilters', initialData);
-  
+
   const [pagination, setPagination] = useState({
     page: initialPage,
     limit: initialLimit,
   });
-  const preFilters = useRef(activeFilters);
-  // Determine data source: fetcher data or initial data
-  const data = hasFetched ? (fetcher.data || initialData) : initialData;
-  console.log(hasFetched, 'has', data);
-  
-  const isLoading = fetcher.state !== 'idle';
 
-  // Submit filter request to server với pagination
-  const filter = (filters, resetPage = true) => {
-    if (!endpoint) {
-      console.warn('No endpoint provided for filter');
-      return;
+  const preFilters = useRef(activeFilters);
+  const isLoading = fetcher.state !== "idle";
+
+  // ⚡ Khi initialData thay đổi (VD: điều hướng Remix)
+  useEffect(() => {
+    setInitData(initialData);
+    setData(initialData);
+    setHasFetched(false);
+  }, [initialData]);
+
+  // ✅ Khi fetcher có data mới -> cập nhật vào state + reset fetcher
+  useEffect(() => {
+    if (fetcher.data !== undefined && fetcher.data !== null) {
+      setHasFetched(true);
+      setData(fetcher.data);
+      fetcher.reset();
     }
-    console.log(filters,'filters');
-    setHasFetched(true); 
-    const newFilters = {
-      ...activeFilters,
-      ...filters
-    };
-    if (JSON.stringify(newFilters) === JSON.stringify(preFilters.current)) return;
-    setActiveFilters(newFilters);
+  }, [fetcher.data]);
+
+  // 🔎 Gửi request filter lên server
+  const filter = (filters, resetPage = true) => {
+    if (!endpoint) return console.warn("No endpoint provided for filter");
+
+    const newFilters = { ...activeFilters, ...filters };
+    if (deepEqual(newFilters, preFilters.current)) return;
+
     preFilters.current = newFilters;
-    const newPagination = resetPage 
+    setActiveFilters(newFilters);
+
+    const newPagination = resetPage
       ? { page: 1, limit: pagination.limit }
       : pagination;
-    
-    if (resetPage) {
-      setPagination(newPagination);
-    }
 
-    // Gửi request lên server
-    console.log({
-        intent: 'filter',
-        ...newFilters,
-        page: newPagination.page,
-        limit: newPagination.limit,
-        classes: JSON.stringify(newFilters.classes),
-        types: JSON.stringify(newFilters.types),
-      });
-    
+    if (resetPage) setPagination(newPagination);
+
     fetcher.submit(
       {
-        intent: 'filter',
+        intent: "filter",
         ...newFilters,
         page: newPagination.page,
         limit: newPagination.limit,
         classes: JSON.stringify(newFilters.classes),
         types: JSON.stringify(newFilters.types),
       },
-      {
-        method: 'post',
-        action: endpoint,
-      }
+      { method: "post", action: endpoint }
     );
   };
 
-  // Change page
+  // 📄 Pagination helpers
   const goToPage = (page) => {
     if (!endpoint) return;
-
-    setPagination(prev => ({ ...prev, page }));
+    setPagination((prev) => ({ ...prev, page }));
     fetcher.submit(
       {
-        intent: 'filter',
+        intent: "filter",
         ...activeFilters,
         page,
         limit: pagination.limit,
         classes: JSON.stringify(activeFilters.classes),
         types: JSON.stringify(activeFilters.types),
       },
-      {
-        method: 'post',
-        action: endpoint,
-      }
+      { method: "post", action: endpoint }
     );
   };
 
-  // Change limit
   const changeLimit = (limit) => {
     if (!endpoint) return;
-
     setPagination({ page: 1, limit });
     fetcher.submit(
       {
-        intent: 'filter',
+        intent: "filter",
         ...activeFilters,
         page: 1,
         limit,
         classes: JSON.stringify(activeFilters.classes),
         types: JSON.stringify(activeFilters.types),
       },
-      {
-        method: 'post',
-        action: endpoint,
-      }
+      { method: "post", action: endpoint }
     );
   };
 
-  // Next page
   const nextPage = () => {
     const totalPages = Math.ceil((data?.total || 0) / pagination.limit);
-    if (pagination.page < totalPages) {
-      goToPage(pagination.page + 1);
-    }
+    if (pagination.page < totalPages) goToPage(pagination.page + 1);
   };
 
-  // Previous page
   const previousPage = () => {
-    if (pagination.page > 1) {
-      goToPage(pagination.page - 1);
-    }
+    if (pagination.page > 1) goToPage(pagination.page - 1);
   };
 
-  // Reset filters
+  // 🧹 Reset filters
   const resetFilters = () => {
     if (!endpoint) return;
 
     const emptyFilters = {
-      search: '',
+      search: "",
       types: [],
       classes: [],
       dateFrom: null,
       dateTo: null,
-      owner: '',
-      category: '',
+      owner: "",
+      category: "",
     };
+
+    if (deepEqual(activeFilters, emptyFilters)) return;
+
     setActiveFilters(emptyFilters);
     setPagination({ page: 1, limit: pagination.limit });
-    
+
     fetcher.submit(
       {
-        intent: 'filter',
+        intent: "filter",
         ...emptyFilters,
         page: 1,
         limit: pagination.limit,
         classes: JSON.stringify([]),
         types: JSON.stringify([]),
       },
-      {
-        method: 'post',
-        action: endpoint,
-      }
+      { method: "post", action: endpoint }
     );
   };
 
-  // Check if any filter is active
   const hasActiveFilters = () => {
-    return activeFilters.search !== '' ||
-           (activeFilters.types && activeFilters.types.length > 0) ||
-           (activeFilters.classes && activeFilters.classes.length > 0) ||
-           activeFilters.dateFrom !== null ||
-           activeFilters.dateTo !== null ||
-           activeFilters.owner !== '' ||
-           activeFilters.category !== '';
+    const empty = {
+      search: "",
+      types: [],
+      classes: [],
+      dateFrom: null,
+      dateTo: null,
+      owner: "",
+      category: "",
+    };
+    return !deepEqual(activeFilters, empty);
   };
 
-  // Calculate pagination info
+  // 📊 Pagination info
   const totalPages = Math.ceil((data?.total || 0) / pagination.limit);
   const hasNextPage = pagination.page < totalPages;
   const hasPreviousPage = pagination.page > 1;
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
   const endIndex = Math.min(pagination.page * pagination.limit, data?.total || 0);
-  console.log(data,'data');
-  
+  console.log(data, 'da');
   return {
     filter,
     resetFilters,
+    initData, // 🔹 giữ nguyên để debug/so sánh khi cần
     filterResult: data?.files || [],
     filtering: isLoading,
     error: data?.error || null,
     activeFilters,
     hasActiveFilters: hasActiveFilters(),
-    
-    // Pagination
     pagination: {
       page: pagination.page,
       limit: pagination.limit,

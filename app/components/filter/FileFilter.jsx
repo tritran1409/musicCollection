@@ -20,7 +20,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
   const [isExpanded, setIsExpanded] = useState(false);
   const { customCategories } = useCategories();
   const categories = (customCategories || []).map((category) => ({
-    value: category.slug,
+    value: category.id,
     label: category.name,
   }));
 
@@ -127,7 +127,8 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
     const mb = bytes / (1024 * 1024);
     return mb.toFixed(2);
   };
-
+  console.log(filters, 'filters');
+  
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
       {/* Header với Search chính */}
@@ -261,16 +262,22 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
                 value={filters.category}
                 onChange={(e) => handleChange('category', e.target.value)}
                 disabled={isDisabled('category')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm bg-white"
+                className="
+      w-full px-3 py-2 border border-gray-300 rounded-lg 
+      focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+      outline-none text-sm bg-white
+      disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed
+    "
               >
                 <option value="">-- Tất cả --</option>
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <option key={cat.value} value={cat.value}>
                     {cat.label}
                   </option>
                 ))}
               </select>
             </div>
+
             { }
             <div className="w-40">
               <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-1.5">

@@ -73,3 +73,64 @@
   flex: 1;
   padding: 2rem;
 }
+.searchForm {
+  display: flex;
+  align-items: center;
+  background: #374151; /* xám đậm giống header */
+  border-radius: 8px;
+  padding: 4px 10px;
+  width: 300px;
+  transition: all 0.2s ease;
+}
+
+.searchForm:focus-within {
+  border: 1px solid #3b82f6;
+  background: #1f2937; /* giữ đồng bộ header */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.searchIcon {
+  color: #9ca3af;
+  margin-right: 6px;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: white;
+  width: 100%;
+}
+.searchWrapper {
+  position: relative;
+  width: 300px;
+}
+
+/* Dropdown */
+.searchDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #ffffff; /* nền trắng */
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-top: 4px;
+  z-index: 50;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Item trong dropdown */
+.searchDropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #111827; /* chữ đen để thấy rõ */
+}
+
+.searchDropdownItem:hover {
+  background: #f3f4f6; /* xám nhạt khi hover */
+}

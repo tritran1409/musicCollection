@@ -10,7 +10,7 @@ export async function loader({ params }) {
   const categoryModel = new CategoryModel();
   const cate = await categoryModel.findBySlug(category);
   const query = { category: cate.id };
-  const files = await fileModel.findAll(query);
+  const files = await fileModel.findWithFilters(query);
   return Response.json({ files, fileType, category: cate.id });
 }
 

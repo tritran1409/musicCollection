@@ -1,12 +1,11 @@
-import { useFetcher } from "react-router";
-import { useCallback, useMemo, useState } from "react";
+import { useFetcherWithReset } from "./useFetcherWithReset";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function useUpdateFile() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
   const [error, setError] = useState(null);
 
-  const updateFile = useCallback(
-    async (data, url = "/updateFile") => {
+  const updateFile = async (data, url = "/updateFile") => {
       if (!data || typeof data !== "object" || !data.id) {
         setError("Thiếu dữ liệu hoặc ID file để cập nhật");
         return;
@@ -23,11 +22,8 @@ export default function useUpdateFile() {
         console.error("Update failed:", err);
         setError(err.message);
       }
-    },
-    [fetcher]
-  );
-  const deleteFile = useCallback(
-    async (fileId) => {
+    }
+  const deleteFile = async (fileId) => {
       if (!fileId) {
         setError("Thiếu dữ liệu hoặc ID file để xóa");
         return;
@@ -44,9 +40,7 @@ export default function useUpdateFile() {
         console.error("Delete failed:", err);
         setError(err.message);
       }
-    },
-    [fetcher]
-  );
+    }
 
   const state = useMemo(
     () => ({
@@ -56,6 +50,11 @@ export default function useUpdateFile() {
     }),
     [fetcher.state, fetcher.data, error]
   );
+  useEffect(() => {
+    if (fetcher.data) {
+      fetcher.reset();
+    }
+  }, [fetcher.data]);
 
   return { updateFile, deleteFile, ...state };
 }

@@ -28,20 +28,41 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
   const [isEdit, setIsEdit] = useState(false);
   const { loading: updateLoading, error: updateError, data: updateData, updateFile, deleteFile } = useUpdateFile();
   const { upload, loading, error, data } = useUpload();
-  console.log(files, 'files');
   
   const initFilterGenerator = useMemo(() => {
-  let temp = {};
+  let temp = {
+    search: "",
+    types: [],
+    classes: [],
+    dateFrom: "",
+    dateTo: "",
+    owner: "",
+    category: "",
+  };
   if (classMate) temp.classes = [Number(classMate)];
   if (fileType) {
     if (["videos", "audios", "images", "documents"].includes(fileType)) {
       temp.types = [fileTypeMap[fileType]];
     }
   }
+  if (category) temp.category = category;
   return temp;
-}, [classMate, fileType]);
-  console.log(initFilterGenerator, 'initFilterGenerator');
-  
+}, [classMate, fileType, category]);
+  const disabledFilters = useMemo(() => {
+    let temp = [];
+    if (classMate) {
+      temp.push('classes');
+    }
+    if (fileType) {
+      if (["videos", "audios", "images", "documents"].includes(fileType)) {
+        temp.push('types');
+      }
+    }
+    if (category) {
+      temp.push('category');
+    }
+    return temp;
+  }, [classMate, fileType, category]);
   const { 
     filterResult, 
     filtering, 
@@ -54,8 +75,7 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     resetFilters,
     activeFilters,
   } = useFilter(files, '/api/filterFile', 1, 20, initFilterGenerator);
-  console.log(filterResult, 'filterResult');
-  
+  console.log(files, filterResult);
   
   const handleUpload = () => {
     if (!selectedFile) return;
@@ -165,9 +185,9 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
       description,
     });
   };
-  const handleFilterChange = useCallback((filters) => {
-    filter(filters);
-  }, [filter]);
+  const handleFilterChange = (filters) => {
+    // filter(filters);
+  }
   return (
     <>
       <div className={styles.header}>
@@ -177,18 +197,7 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
         <FileFilter
           onFilterChange={handleFilterChange}
           initialFilters={activeFilters}
-          disabledFilters={(() => {
-            let temp = [];
-            if (classMate) {
-              temp.push('classes');
-            }
-            if (fileType) {
-              if (["videos", "audios", "images", "documents"].includes(fileType)) {
-                temp.push('types');
-              }
-            }
-            return temp;
-          })()}
+          disabledFilters={disabledFilters}
         />
       </div>
       <div className={styles.container}>

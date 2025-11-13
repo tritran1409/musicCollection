@@ -1,7 +1,8 @@
-import { Form, redirect, useActionData, useFetcher } from "react-router";
 import { useForm } from "react-hook-form";
-import styles from "../LoginForm.module.css";
+import { Form, redirect } from "react-router";
+import { useFetcherWithReset } from "../../../hooks/useFetcherWithReset";
 import Logo from "../../logo/Logo";
+import styles from "../LoginForm.module.css";
 import { useEffect, useState } from "react";
 
 export async function action({ request }) {
@@ -22,13 +23,24 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
+  const [fetchError, setFetchError] = useState(null);
   const onSubmit = (data) => {
     const form = new FormData();
     form.append("email", data.email);
     form.append("password", data.password);
     fetcher.submit(form, { method: "post" });
   };
+  useEffect(() => {
+    if (fetcher.data) {
+      if (fetcher.data.error) {
+        setFetchError(fetcher.data.error);
+      } else {
+        setFetchError(null);
+      }
+      fetcher.reset();
+    }
+  }, [fetcher.data]);
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -55,7 +67,7 @@ export default function LoginPage() {
             {errors.password && <p className={styles.error}>{errors.password.message}</p>}
           </div>
 
-          {fetcher.data?.error && <p className={styles.error}>{fetcher.data.error}</p>}
+          {fetchError && <p className={styles.error}>{fetchError}</p>}
 
           <button type="submit" className={styles.button} disabled={isSubmitting}>
             {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}

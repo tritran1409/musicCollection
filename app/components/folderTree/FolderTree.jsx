@@ -1,10 +1,11 @@
-import { AddCategoryModal } from "./modal/AddCategoryModal";
-import styles from "./FolderTree.module.css";
-import { useState } from "react";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
-import { Link, useFetcher } from "react-router";
-import { EditCategoryModal } from "./modal/EditCategoryModal";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { useFetcherWithReset } from "../../hooks/useFetcherWithReset";
+import styles from "./FolderTree.module.css";
+import { AddCategoryModal } from "./modal/AddCategoryModal";
 import { DeleteModal } from "./modal/DeleteModal";
+import { EditCategoryModal } from "./modal/EditCategoryModal";
 
 const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = null }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +16,7 @@ const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = nul
   const canAddCategory = item.custom === true;
   
   const isOwner = item.ownerId === user?.id;
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithReset();
   const isActive = currentPath === item.path ||
     (hasChildren && item.children.some(child =>
       currentPath.startsWith(child.path)
@@ -85,6 +86,11 @@ const TreeItem = ({ item, level = 0, onCategoryAdd, currentPath = '', user = nul
 
     setIsDeleteModalOpen(false);
   };
+  useEffect(() => {
+    if (fetcher.data) {
+      fetcher.reset();
+    }
+  }, [fetcher.data]);
   const ItemContent = () => (
     <div
       className={`${styles.itemContent} ${isActive && !hasChildren ? styles.active : ''}`}

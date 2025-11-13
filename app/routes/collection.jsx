@@ -36,8 +36,8 @@ export async function loader({ params }) {
     return redirect("/bang-dieu-khien");
   }
   const query = {};
-  if (fileType) query.type = typeMap[fileType];
-  const files = await fileModel.findAll(query);
+  if (fileType) query.types = [typeMap[fileType]];
+  const files = await fileModel.findWithFilters(query);
   return Response.json({ files, fileType });
 }
 
