@@ -7,10 +7,10 @@ export default function useFilter(
   endpoint = null,
   initialPage = 1,
   initialLimit = 20,
-  initialFilters = {}
+  initialFilters = {},
+  key = ""
 ) {
   const fetcher = useFetcherWithReset();
-  const [hasFetched, setHasFetched] = useState(false);
 
   // initData là bản gốc (loader)
   const [initData, setInitData] = useState(initialData);
@@ -22,10 +22,12 @@ export default function useFilter(
     search: initialFilters.search || "",
     types: initialFilters.types || [],
     classes: initialFilters.classes || [],
-    dateFrom: initialFilters.dateFrom || null,
-    dateTo: initialFilters.dateTo || null,
+    dateFrom: initialFilters.dateFrom || "",
+    dateTo: initialFilters.dateTo || "",
     owner: initialFilters.owner || "",
     category: initialFilters.category || "",
+    minSize: initialFilters.minSize || "",
+    maxSize: initialFilters.maxSize || "",
   });
 
   const [pagination, setPagination] = useState({
@@ -33,33 +35,35 @@ export default function useFilter(
     limit: initialLimit,
   });
 
-  const preFilters = useRef(activeFilters);
   const isLoading = fetcher.state !== "idle";
-
+  console.log(initialFilters, "-----" ,activeFilters);
+  
   // ⚡ Khi initialData thay đổi (VD: điều hướng Remix)
   useEffect(() => {
     setInitData(initialData);
     setData(initialData);
-    setHasFetched(false);
-  }, [initialData]);
+  }, [key]);
 
   // ✅ Khi fetcher có data mới -> cập nhật vào state + reset fetcher
-  useEffect(() => {
+  useEffect(() => {    
     if (fetcher.data !== undefined && fetcher.data !== null) {
-      setHasFetched(true);
       setData(fetcher.data);
       fetcher.reset();
     }
-  }, [fetcher.data]);
+  }, [fetcher]);
 
   // 🔎 Gửi request filter lên server
   const filter = (filters, resetPage = true) => {
     if (!endpoint) return console.warn("No endpoint provided for filter");
-
     const newFilters = { ...activeFilters, ...filters };
-    if (deepEqual(newFilters, preFilters.current)) return;
+    console.log(newFilters, initialFilters);
+    
+    if (deepEqual(newFilters, initialFilters)) {
+      setData(initialData);
+      setActiveFilters(newFilters);
+      return;
+    }
 
-    preFilters.current = newFilters;
     setActiveFilters(newFilters);
 
     const newPagination = resetPage
@@ -135,6 +139,8 @@ export default function useFilter(
       dateTo: null,
       owner: "",
       category: "",
+      minSize: "",
+      maxSize: "",
     };
 
     if (deepEqual(activeFilters, emptyFilters)) return;
@@ -164,17 +170,30 @@ export default function useFilter(
       dateTo: null,
       owner: "",
       category: "",
+      minSize: "",
+      maxSize: "",
     };
     return !deepEqual(activeFilters, empty);
   };
-
+  const reFetch = () => {
+    fetcher.submit(
+      {
+        intent: "filter",
+        ...activeFilters,
+        page: pagination.page,
+        limit: pagination.limit,
+        classes: JSON.stringify(activeFilters.classes),
+        types: JSON.stringify(activeFilters.types),
+      },
+      { method: "post", action: endpoint }
+    );
+  };
   // 📊 Pagination info
   const totalPages = Math.ceil((data?.total || 0) / pagination.limit);
   const hasNextPage = pagination.page < totalPages;
   const hasPreviousPage = pagination.page > 1;
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
   const endIndex = Math.min(pagination.page * pagination.limit, data?.total || 0);
-  console.log(data, 'da');
   return {
     filter,
     resetFilters,

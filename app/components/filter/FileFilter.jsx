@@ -10,7 +10,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
     category: '',
     dateFrom: '',
     dateTo: '',
-    ownerName: '',
+    owner: '',
     minSize: '',
     maxSize: '',
     ...initialFilters
@@ -103,7 +103,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
       filters.category !== '' ||
       filters.dateFrom !== '' ||
       filters.dateTo !== '' ||
-      filters.ownerName !== '' ||
+      filters.owner !== '' ||
       filters.minSize !== '' ||
       filters.maxSize !== '';
   };
@@ -116,7 +116,7 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
     if (filters.category) count++;
     if (filters.dateFrom) count++;
     if (filters.dateTo) count++;
-    if (filters.ownerName) count++;
+    if (filters.owner) count++;
     if (filters.minSize) count++;
     if (filters.maxSize) count++;
     return count;
@@ -247,9 +247,9 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
               <input
                 type="text"
                 placeholder="Tìm theo tên..."
-                value={filters.ownerName}
-                onChange={(e) => handleChange('ownerName', e.target.value)}
-                disabled={isDisabled('ownerName')}
+                value={filters.owner}
+                onChange={(e) => handleChange('owner', e.target.value)}
+                disabled={isDisabled('owner')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
               />
             </div>
@@ -373,11 +373,11 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
                   )}
                 </span>
               ))}
-              {filters.ownerName && (
+              {filters.owner && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs">
-                  Người tạo: {filters.ownerName}
-                  {!isDisabled('ownerName') && (
-                    <button onClick={() => handleChange('ownerName', '')} className="hover:bg-amber-200 rounded-full p-0.5">
+                  Người tạo: {filters.owner}
+                  {!isDisabled('owner') && (
+                    <button onClick={() => handleChange('owner', '')} className="hover:bg-amber-200 rounded-full p-0.5">
                       <X className="w-3 h-3" />
                     </button>
                   )}

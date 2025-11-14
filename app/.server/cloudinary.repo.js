@@ -13,6 +13,8 @@ export class CloudinaryRepo {
       resourceType = "image";
     } else if (file.type.startsWith("video/")) {
       resourceType = "video";
+    } else if (file.type.startsWith("audio/")) {
+      resourceType = "auto";
     } else {
       resourceType = "raw";
     }

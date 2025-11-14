@@ -73,64 +73,210 @@
   flex: 1;
   padding: 2rem;
 }
-.searchForm {
+.searchButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.searchButton:hover {
+  background: #374151;
+}
+
+/* Modal */
+.searchModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+  z-index: 300;
+}
+
+.searchModal {
+  width: 60%;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+  position: relative;
+}
+
+/* Search input trong modal */
+.searchInputContainer {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.searchInputInner {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+.searchInputInner:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 25%);
+}
+
+.searchInputIcon {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+/* Result list */
+.searchResults {
+  padding: 10px 0;
+  overflow-y: auto;
+}
+
+.searchItem {
+  position: relative;
   display: flex;
   align-items: center;
-  background: #374151; /* xám đậm giống header */
-  border-radius: 8px;
-  padding: 4px 10px;
-  width: 300px;
-  transition: all 0.2s ease;
-}
-
-.searchForm:focus-within {
-  border: 1px solid #3b82f6;
-  background: #1f2937; /* giữ đồng bộ header */
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.searchIcon {
-  color: #9ca3af;
-  margin-right: 6px;
-}
-
-.searchInput {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.875rem;
-  color: white;
-  width: 100%;
-}
-.searchWrapper {
-  position: relative;
-  width: 300px;
-}
-
-/* Dropdown */
-.searchDropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  max-height: 250px;
-  overflow-y: auto;
-  background: #ffffff; /* nền trắng */
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  margin-top: 4px;
-  z-index: 50;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-/* Item trong dropdown */
-.searchDropdownItem {
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: background 0.2s;
-  color: #111827; /* chữ đen để thấy rõ */
+  transition: background 0.15s;
 }
 
-.searchDropdownItem:hover {
-  background: #f3f4f6; /* xám nhạt khi hover */
+.searchItem:hover {
+  background: #f3f4f6;
+}
+
+.searchItemThumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.searchItemIcon {
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.searchItemInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchItemName {
+  font-weight: 600;
+}
+
+.searchItemFilename {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.searchActions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.searchItem:hover .searchActions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.searchActionBtn {
+  background: #f3f4f6;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px; /* ICON TO RÕ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.searchActionBtn:hover {
+  background: #e5e7eb;
+  transform: scale(1.07);
+}
+.searchUser {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.searchUser span {
+  font-weight: 500;
+  color: #374151;
+}
+
+
+.advancedSearchBtn {
+  background: #1f2937;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease;
+}
+
+.advancedSearchBtn:hover {
+  background: #111827;
+}
+
+.searchFooter {
+  opacity: 0.7  ;
+  position: absolute; /* hoặc fixed nếu modal scroll nội dung lớn */
+  bottom: 0;
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #e5e7eb;
+  backdrop-filter: blur(4px); /* làm mờ nền phía sau */
+  z-index: 20;
+}
+
+.advancedBtn {
+  padding: 8px 16px;
+  background: #1f2937;
+  color: #ffffffcc; /* mờ nhẹ */
+  font-size: 0.9rem;
+  border-radius: 8px;
+  transition: 0.2s;
+  text-decoration: none;
+}
+
+.advancedBtn:hover {
+  color: #fff; /* đậm hơn khi hover */
+  background: #111827;
 }

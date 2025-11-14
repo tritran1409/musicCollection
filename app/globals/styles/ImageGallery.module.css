@@ -23,6 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1rem;
   margin-bottom: 1.2rem;
   font-weight: 600;
   font-size: 1.2rem;
@@ -132,29 +133,6 @@
   margin-right: 6px;
 }
 
-/* Hover tooltip */
-.filename::after {
-  content: attr(data-fullname);
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: #fff;
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  border-radius: 6px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease-in-out;
-  z-index: 10;
-}
-
-.filename:hover::after {
-  opacity: 1;
-}
-
 /* =============================
  ⚙️ ACTION BUTTONS
 ============================= */
@@ -184,20 +162,38 @@
 /* =============================
  📥 RIGHT PANEL
 ============================= */
-.addBtn {
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #2563eb;
-  color: white;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.875rem;
   font-weight: 500;
   border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
   cursor: pointer;
-  transition: background 0.25s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
-.addBtn:hover {
+.uploadBtn:hover {
   background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
+
+.uploadBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
 
 /* =============================
  📄 FILE DETAILS

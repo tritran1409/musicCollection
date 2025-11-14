@@ -6,6 +6,7 @@ export default [
         route(`chuong-trinh-hoc/:class/:file_type`, "routes/media.jsx"),
         route(`suu-tap/:file_type`, "routes/collection.jsx"),
         route(`tuy-chinh/:category`, "routes/category.jsx"),
+        route(`tim-kiem`, "routes/search.jsx"),
     ]),
     layout("layouts/authen/Authen.jsx", [
         route("login", "routes/Login.jsx"),

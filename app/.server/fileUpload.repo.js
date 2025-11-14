@@ -15,6 +15,7 @@ export class FileModel extends BaseModel {
   async uploadFileToCloudinary(file, folder = "general", userId = null, extraData = {}) {
     const originalFilename = file.name;
     const fileType = file.type;
+    
     const user = await this.userRepo.findById(userId);
     if (!user) throw new Error("User not found");
     const result = await this.cloudinaryRepo.upload(file, folder);
@@ -34,7 +35,7 @@ export class FileModel extends BaseModel {
       name: extraData?.name,
       description: extraData?.description,
       classes: extraData?.classes || [],
-      type: resourceType,
+      type:fileType.startsWith("audio/") ? "audio" : resourceType,
       size: result.bytes,
       src: 'cloudinary',
       detail: result,
@@ -141,6 +142,7 @@ export class FileModel extends BaseModel {
         totalPages,
         hasNextPage: pageNum < totalPages,
         hasPreviousPage: pageNum > 1,
+        version: Date.now(),
       };
     } catch (error) {
       console.error('Error in findWithFilters:', error);

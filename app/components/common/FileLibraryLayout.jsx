@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Download, FileText, Music, Pencil, Trash2, X } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { Check, Download, Eye, FileText, Music, Pencil, Trash2, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "../../globals/styles/ImageGallery.module.css";
 import Modal from "../modals/upload/Modal.jsx";
 import ClassSelector from "./ClassSelector.jsx";
@@ -10,6 +10,7 @@ import useUpload from "../../hooks/useUpload.js";
 import { DeleteModal } from "../folderTree/modal/DeleteModal.jsx";
 import { FileFilter } from "../filter/FileFilter.jsx";
 import useFilter from "../../hooks/useFileFilter.js";
+import { useLocation } from "react-router";
 const fileTypeMap = {
     "videos": "video",
     "audios": "audio",
@@ -17,6 +18,7 @@ const fileTypeMap = {
     "documents": "raw",
 }
 export default function FileLibraryPage({ files, fileType = "raw", classMate = null, accept = "*/*", category = null, pageName = "📁 Thư viện tệp" }) {
+  const location = useLocation();
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [clickedFile, setClickedFile] = useState(null);
@@ -38,6 +40,8 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     dateTo: "",
     owner: "",
     category: "",
+    minSize: "",
+    maxSize: "",
   };
   if (classMate) temp.classes = [Number(classMate)];
   if (fileType) {
@@ -74,8 +78,7 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     changeLimit,
     resetFilters,
     activeFilters,
-  } = useFilter(files, '/api/filterFile', 1, 20, initFilterGenerator);
-  console.log(files, filterResult);
+  } = useFilter(files, '/api/filterFile', 1, 20, initFilterGenerator, `fileLibrary:${files?.version}${classMate}${fileType}${category}`);
   
   const handleUpload = () => {
     if (!selectedFile) return;
@@ -186,12 +189,27 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     });
   };
   const handleFilterChange = (filters) => {
-    // filter(filters);
+    filter(filters);
   }
+  const handleWatch = (file) => {
+    if (!file) return;
+    window.open(file.url, "_blank", "noopener,noreferrer");
+  }
+  useEffect(() => {
+    setClickedFile(null);
+  }, [location.pathname]);
   return (
     <>
       <div className={styles.header}>
         <h2>{pageName}</h2>
+        <button className={styles.uploadBtn} onClick={() => setModalOpen(true)}>
+          <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points="7 9 12 4 17 9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="12" y1="4" x2="12" y2="16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Tải lên
+        </button>
       </div>
       <div className={styles.filterContainer}>
         <FileFilter
@@ -219,6 +237,18 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
                 <div className={styles.meta}>
                   <span className={styles.filename} title={file.filename}>{file.filename}</span>
                   <div className={styles.actions}>
+                    {file.url && ["image", "video", "audio"].includes(file.type) && (
+                      <button
+                        className={styles.iconBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWatch(file);
+                        }}
+                        title="xem"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    )}
                     {file.downloadUrl && (
                       <button
                         className={styles.iconBtn}
@@ -242,10 +272,6 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
 
       {/* RIGHT SIDE */}
       <div className={styles.rightPane}>
-        <button className={styles.addBtn} onClick={() => setModalOpen(true)}>
-          + TẢI LÊN
-        </button>
-
         {/* FILE INFO SECTION */}
         <AnimatePresence>
           {clickedFile && (
@@ -257,17 +283,27 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
               transition={{ duration: 0.25 }}
             >
               <div className={styles.sideActions}>
-                <button
-                  onClick={handleEditClick}
-                  className={styles.viewBtn}
-                >
-                  <Pencil size={18} />
-                </button>
+                {
+                  ["image", "video", "audio"].includes(clickedFile.type) && (
+                    <button
+                      onClick={() => handleWatch(clickedFile)}
+                      className={styles.viewBtn}
+                    >
+                      <Eye size={18} />
+                    </button>
+                  )
+                }
                 <button
                   onClick={() => handleDownload(clickedFile)}
                   className={styles.viewBtn}
                 >
                   <Download size={18} />
+                </button>
+                <button
+                  onClick={handleEditClick}
+                  className={styles.viewBtn}
+                >
+                  <Pencil size={18} />
                 </button>
                 <button
                   onClick={() => setIsDeleteModalOpen(true)}

@@ -39,11 +39,11 @@ export default function useUpload() {
     }),
     [fetcher.state, fetcher.data, error]
   );
-  useEffect(() => {
-    if (fetcher.data) {
-      fetcher.reset();
-    }
-  }, [fetcher.data]);
+  // useEffect(() => {
+  //   if (fetcher.data) {
+  //     fetcher.reset();
+  //   }
+  // }, [fetcher.data]);
 
   return { upload, ...state };
 }
