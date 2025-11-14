@@ -63,7 +63,7 @@ model Lesson {
   creator    String
   ownerId    String?  @db.ObjectId
   ownerName    String?
-  files      File[]
+  fileIds      String[] @db.ObjectId @default([])
   classId    String?  @db.ObjectId
   createdAt   DateTime  @default(now())
 }

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import styles from "../../globals/styles/lessonList.module.css";
+import { useNavigate } from "react-router";
 
 export async function loader({ params }) {
-  const { id } = params;
+  const { classId } = params;
 
   const lessons = [
     { id: 1, title: "Giới thiệu Toán học cơ bản", creator: "Thầy Nguyễn Văn A" },
@@ -10,11 +11,12 @@ export async function loader({ params }) {
     { id: 3, title: "Làm quen chữ cái A, B, C", creator: "Cô Lê Minh C" },
   ];
 
-  return { classId: id, lessons };
+  return { classId, lessons };
 }
 
 export default function LessonList({ loaderData }) {
   const { classId, lessons } = loaderData;
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [newLesson, setNewLesson] = useState({ title: "", creator: "" });
   const [allLessons, setAllLessons] = useState(lessons);
@@ -39,7 +41,7 @@ export default function LessonList({ loaderData }) {
         <h1 className={styles.title}>📚 Danh sách bài giảng – Lớp {classId}</h1>
 
         {/* Nút Add New */}
-        <button className={styles.addBtn} onClick={() => setShowModal(true)}>
+        <button className={styles.addBtn} onClick={() => navigate(`/bang-dieu-khien/chuong-trinh-hoc/bai-giang/create/${classId}`)}>
           ➕ Add New Lesson
         </button>
       </div>
@@ -66,40 +68,6 @@ export default function LessonList({ loaderData }) {
           </tbody>
         </table>
       </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <h2>Tạo bài giảng mới</h2>
-
-            <label>Tiêu đề</label>
-            <input
-              type="text"
-              value={newLesson.title}
-              onChange={(e) =>
-                setNewLesson({ ...newLesson, title: e.target.value })
-              }
-            />
-
-            <label>Người tạo</label>
-            <input
-              type="text"
-              value={newLesson.creator}
-              onChange={(e) =>
-                setNewLesson({ ...newLesson, creator: e.target.value })
-              }
-            />
-
-            <div className={styles.modalActions}>
-              <button onClick={() => setShowModal(false)}>Huỷ</button>
-              <button onClick={handleCreate} className={styles.confirmBtn}>
-                Tạo mới
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
