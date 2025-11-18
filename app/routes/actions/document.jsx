@@ -1,10 +1,10 @@
 // api/document.js
 import { DocumentModel } from '../../.server/document.repo';
-import { requireAuth } from '../../utils/auth';
+import { getUser } from '../../service/auth.server';
 
 export async function action({ request }) {
   // Kiểm tra authentication
-  const user = await requireAuth(request);
+  const user = await getUser(request);
   
   const formData = await request.formData();
   const intent = formData.get('intent');

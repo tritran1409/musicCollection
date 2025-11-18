@@ -6,8 +6,10 @@ export default [
         route(`chuong-trinh-hoc/:class/:file_type`, "routes/media.jsx"),
         route(`suu-tap/:file_type`, "routes/collection.jsx"),
         route(`tuy-chinh/:category`, "routes/category.jsx"),
-        route(`thong-tin-suu-tam/:category`, "routes/document.jsx"),
-        route(`thong-tin-suu-tam/tao-moi`, "routes/document/documentEditor.jsx"),
+        route(`thong-tin-suu-tam/:categorySlug`, "routes/document.jsx"),
+        route(`thong-tin-suu-tam/tao-moi/:categoryId`, "routes/document/documentCreate.jsx"),
+        route(`thong-tin-suu-tam/chinh-sua/:documentId`, "routes/document/documentEdit.jsx"),
+        route(`thong-tin-suu-tam/xem/:documentId`, "routes/document/documentView.jsx"),
         route(`tim-kiem`, "routes/search.jsx"),
         route(`chuong-trinh-hoc/bai-giang/create/:classId?`, "routes/dashboard/createLesson.jsx"),
         route(`chuong-trinh-hoc/bai-giang/edit/:lessonId`, "routes/dashboard/editLesson.jsx"),
@@ -23,4 +25,5 @@ export default [
     route("api/category", "routes/actions/category.jsx"),
     route("api/filterFile", "routes/actions/filterFile.jsx"),
     route("api/lesson", "routes/actions/lesson.jsx"),
+    route("api/document", "routes/actions/document.jsx"),
 ] satisfies RouteConfig;

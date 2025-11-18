@@ -4,12 +4,15 @@ import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import { DocumentModel } from "../.server/document.repo";
 import { useFetcherWithReset } from "../hooks/useFetcherWithReset";
+import { CategoryModel } from "../.server/category.repo";
 
 export async function loader({ params }) {
-  const { categoryId } = params;
+  const { categorySlug } = params;
+  const categoryModel = new CategoryModel();
+  const category = await categoryModel.findBySlug(categorySlug);
   const documentModel = new DocumentModel();
-  const documents = await documentModel.findByCategory(categoryId);
-  return { categoryId, documents };
+  const documents = await documentModel.findByCategory(category.id);
+  return { categoryId: category.id, documents };
 }
 
 export default function DocumentList({ loaderData }) {
@@ -63,7 +66,7 @@ export default function DocumentList({ loaderData }) {
 
   const handleEditDocument = (e, documentId) => {
     e.stopPropagation();
-    navigate(`/bang-dieu-khien/tai-lieu/edit/${documentId}`);
+    navigate(`/bang-dieu-khien/thong-tin-suu-tam/chinh-sua/${documentId}`);
   };
 
   const handleDeleteClick = (e, document) => {
@@ -92,7 +95,7 @@ export default function DocumentList({ loaderData }) {
 
   const handleViewContent = () => {
     if (selectedDocument) {
-      navigate(`/bang-dieu-khien/tai-lieu/view/${selectedDocument.id}`);
+      navigate(`/bang-dieu-khien/thong-tin-suu-tam/xem/${selectedDocument.id}`);
     }
   };
 
@@ -113,7 +116,7 @@ export default function DocumentList({ loaderData }) {
           <h1 className={styles.title}>📚 Danh sách tài liệu văn học</h1>
           <button 
             className={styles.addBtn} 
-            onClick={() => navigate(`/bang-dieu-khien/thong-tin-suu-tam/tao-moi`)}
+            onClick={() => navigate(`/bang-dieu-khien/thong-tin-suu-tam/tao-moi/${categoryId}`)}
           >
             ➕ Thêm tài liệu
           </button>
@@ -151,7 +154,7 @@ export default function DocumentList({ loaderData }) {
                         )}
                       </div>
                     </td>
-                    <td>{document.createdBy?.name || '—'}</td>
+                    <td>{document.ownerName || '—'}</td>
                     <td>{formatDate(document.createdAt)}</td>
                     <td className={styles.actionCell}>
                       <div className={styles.documentActions}>
@@ -181,7 +184,7 @@ export default function DocumentList({ loaderData }) {
             <p>📭 Chưa có tài liệu nào</p>
             <button 
               className={styles.addBtnLarge}
-              onClick={() => navigate(`/bang-dieu-khien/thong-tin-suu-tam/tao-moi`)}
+              onClick={() => navigate(`/bang-dieu-khien/thong-tin-suu-tam/tao-moi/${categoryId}`)}
             >
               ➕ Tạo tài liệu đầu tiên
             </button>
@@ -295,7 +298,7 @@ export default function DocumentList({ loaderData }) {
               <div className={styles.metadataItem}>
                 <div className={styles.metadataLabel}>Người tạo</div>
                 <div className={styles.metadataValue}>
-                  {selectedDocument.createdBy?.name || '—'}
+                  {selectedDocument.ownerName || '—'}
                 </div>
               </div>
 
@@ -342,7 +345,7 @@ export default function DocumentList({ loaderData }) {
               </button>
               <button 
                 className={`${styles.detailActionButton} ${styles.editDetailButton}`}
-                onClick={() => navigate(`/bang-dieu-khien/tai-lieu/edit/${selectedDocument.id}`)}
+                onClick={() => navigate(`/bang-dieu-khien/thong-tin-suu-tam/chinh-sua/${selectedDocument.id}`)}
               >
                 ✏️ Chỉnh sửa tài liệu
               </button>

@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { useFetcherWithReset } from "../../hooks/useFetcherWithReset";
-import { DocumentModel } from "../../.server/document.repo";
 import toast from "react-hot-toast";
 import styles from "../../globals/styles/documentEditor.module.css";
-import RichTextEditor from "../../components/editor/RichTextEditor";
+import RichTextEditor from "../editor/RichTextEditor";
 
-export async function loader({ params }) {
-  const { documentId } = params;
-  
-  if (documentId && documentId !== 'create') {
-    const documentModel = new DocumentModel();
-    const document = await documentModel.findById(documentId);
-    return { document, isEdit: true };
-  }
-  
-  return { document: null, isEdit: false };
-}
-
-export default function DocumentEditor({ loaderData }) {
-  const { document, isEdit } = loaderData;
+/**
+ * DocumentEditorComponent - Component tái sử dụng cho tạo/sửa tài liệu
+ * @param {Object} props
+ * @param {Object|null} props.document - Tài liệu cần sửa (null nếu tạo mới)
+ * @param {boolean} props.isEdit - Chế độ chỉnh sửa hay tạo mới
+ * @param {string} props.apiEndpoint - API endpoint để submit (mặc định: '/api/document')
+ * @param {string} props.redirectPath - Đường dẫn redirect sau khi lưu thành công
+ */
+export default function DocumentEditorComponent({ 
+  document = null,
+  isEdit = false,
+  apiEndpoint = '/api/document',
+  redirectPath = '/bang-dieu-khien/thong-tin-suu-tam',
+  categoryId = null,
+}) {
   const navigate = useNavigate();
   const fetcher = useFetcherWithReset();
+  
   const [formData, setFormData] = useState({
     title: document?.title || '',
     description: document?.description || '',
@@ -31,6 +32,19 @@ export default function DocumentEditor({ loaderData }) {
   });
 
   const [currentClass, setCurrentClass] = useState('');
+
+  // Reset form data khi document thay đổi
+  useEffect(() => {
+    if (document) {
+      setFormData({
+        title: document.title || '',
+        description: document.description || '',
+        content: document.content || '',
+        categoryId: document.categoryId || '',
+        classes: document.classes || []
+      });
+    }
+  }, [document]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -81,18 +95,21 @@ export default function DocumentEditor({ loaderData }) {
     const submitData = new FormData();
     submitData.append('intent', isEdit ? 'update' : 'create');
     
-    if (isEdit) {
+    if (isEdit && document?.id) {
       submitData.append('documentId', document.id);
     }
     
     submitData.append('title', formData.title);
     submitData.append('description', formData.description);
     submitData.append('content', formData.content);
-    submitData.append('categoryId', formData.categoryId);
+    submitData.append('categoryId', categoryId);
     submitData.append('classes', JSON.stringify(formData.classes));
+    if (redirectPath) {
+        submitData.append('redirectPath', redirectPath);
+    }
 
     fetcher.submit(submitData, {
-      action: '/api/document',
+      action: apiEndpoint,
       method: 'post'
     });
   };
@@ -104,13 +121,13 @@ export default function DocumentEditor({ loaderData }) {
   useEffect(() => {
     if (fetcher.data?.success) {
       toast.success(isEdit ? 'Đã cập nhật tài liệu' : 'Đã tạo tài liệu mới');
-      navigate('/bang-dieu-khien/tai-lieu');
+      navigate(redirectPath);
       fetcher.reset();
     } else if (fetcher.data?.error) {
       toast.error(fetcher.data.error);
       fetcher.reset();
     }
-  }, [fetcher.data]);
+  }, [fetcher.data, isEdit, navigate, redirectPath, fetcher]);
 
   return (
     <div className={styles.editorWrapper}>
@@ -229,7 +246,6 @@ export default function DocumentEditor({ loaderData }) {
             <RichTextEditor
               value={formData.content}
               onChange={handleContentChange}
-              placeholder="Nhập nội dung chi tiết của tài liệu..."
             />
           </div>
         </div>
