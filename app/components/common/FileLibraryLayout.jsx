@@ -13,11 +13,12 @@ import useFilter from "../../hooks/useFileFilter.js";
 import { useLocation } from "react-router";
 import { getFilePreview } from "../../helper/uiHelper.jsx";
 import { useFileDownload } from "../../hooks/useDownloadFile.js";
+import Pagination from "../pagination/Pagination.jsx";
 const fileTypeMap = {
-    "videos": "video",
-    "audios": "audio",
-    "images": "image",
-    "documents": "raw",
+  "videos": "video",
+  "audios": "audio",
+  "images": "image",
+  "documents": "raw",
 }
 export default function FileLibraryPage({ files, fileType = "raw", classMate = null, accept = "*/*", category = null, pageName = "📁 Thư viện tệp" }) {
   const location = useLocation();
@@ -32,28 +33,28 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
   const { loading: updateLoading, error: updateError, data: updateData, updateFile, deleteFile } = useUpdateFile();
   const { upload, loading, error, data } = useUpload();
   const { downloadFile, downloading } = useFileDownload();
-  
+
   const initFilterGenerator = useMemo(() => {
-  let temp = {
-    search: "",
-    types: [],
-    classes: [],
-    dateFrom: "",
-    dateTo: "",
-    owner: "",
-    category: "",
-    minSize: "",
-    maxSize: "",
-  };
-  if (classMate) temp.classes = [Number(classMate)];
-  if (fileType) {
-    if (["videos", "audios", "images", "documents"].includes(fileType)) {
-      temp.types = [fileTypeMap[fileType]];
+    let temp = {
+      search: "",
+      types: [],
+      classes: [],
+      dateFrom: "",
+      dateTo: "",
+      owner: "",
+      category: "",
+      minSize: "",
+      maxSize: "",
+    };
+    if (classMate) temp.classes = [Number(classMate)];
+    if (fileType) {
+      if (["videos", "audios", "images", "documents"].includes(fileType)) {
+        temp.types = [fileTypeMap[fileType]];
+      }
     }
-  }
-  if (category) temp.category = category;
-  return temp;
-}, [classMate, fileType, category]);
+    if (category) temp.category = category;
+    return temp;
+  }, [classMate, fileType, category]);
   const disabledFilters = useMemo(() => {
     let temp = [];
     if (classMate) {
@@ -69,9 +70,9 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     }
     return temp;
   }, [classMate, fileType, category]);
-  const { 
-    filterResult, 
-    filtering, 
+  const {
+    filterResult,
+    filtering,
     filter,
     pagination,
     nextPage,
@@ -81,7 +82,7 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
     resetFilters,
     activeFilters,
   } = useFilter(files, '/api/filterFile', 1, 20, initFilterGenerator, `fileLibrary:${files?.version}${classMate}${fileType}${category}`);
-  
+
   const handleUpload = () => {
     if (!selectedFile) return;
     const dataUpload = {
@@ -173,191 +174,215 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
         />
       </div>
       <div className={styles.container}>
-      {/* LEFT SIDE */}
-      <div className={styles.leftPane}>
-        {filterResult.length === 0 ? (
-          <p className={styles.empty}>Chưa có tệp nào được tải lên</p>
-        ) : (
-          <div className={styles.grid}>
-            {filterResult.map((file) => (
-              <motion.div
-                key={file.id}
-                className={`${styles.card} ${clickedFile?.id === file.id ? styles.activeCard : ""}`}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setClickedFile(file)}
-              >
-                <div className={styles.previewWrapper}>{getFilePreview(file)}</div>
-                <div className={styles.meta}>
-                  <span className={styles.filename} title={file.filename}>{file.filename}</span>
-                  <div className={styles.actions}>
-                    {file.url && ["image", "video", "audio"].includes(file.type) && (
-                      <button
-                        className={styles.iconBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleWatch(file);
-                        }}
-                        title="xem"
-                      >
-                        <Eye size={16} />
-                      </button>
-                    )}
-                    {file.downloadUrl && (
-                      <button
-                        className={styles.iconBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          downloadFile(file);
-                        }}
-                        disabled={downloading === file.id}
-                        title="Tải xuống"
-                      >
-                        <Download size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* RIGHT SIDE */}
-      <div className={styles.rightPane}>
-        {/* FILE INFO SECTION */}
-        <AnimatePresence>
-          {clickedFile && (
-            <motion.div
-              className={styles.fileDetail}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className={styles.sideActions}>
-                {
-                  ["image", "video", "audio"].includes(clickedFile.type) && (
-                    <button
-                      onClick={() => handleWatch(clickedFile)}
-                      className={styles.viewBtn}
+        {/* LEFT SIDE */}
+        <div className={styles.leftPane}>
+          {filterResult.length === 0 ? (
+            <p className={styles.empty}>Chưa có tệp nào được tải lên</p>
+          ) : (
+            <>
+              <div className={styles.gridWrapper}>
+                <div className={styles.grid}>
+                  {filterResult.map((file) => (
+                    <motion.div
+                      key={file.id}
+                      className={`${styles.card} ${clickedFile?.id === file.id ? styles.activeCard : ""}`}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setClickedFile(file)}
                     >
-                      <Eye size={18} />
-                    </button>
-                  )
-                }
-                <button
-                  onClick={() => downloadFile(clickedFile)}
-                  className={styles.viewBtn}
-                >
-                  <Download size={18} />
-                </button>
-                <button
-                  onClick={handleEditClick}
-                  className={styles.viewBtn}
-                >
-                  <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => setIsDeleteModalOpen(true)}
-                  className={styles.deleteBtn}
-                >
-                  <Trash2 size={18} />
-                </button>
+                      <div className={styles.previewWrapper}>{getFilePreview(file)}</div>
+                      <div className={styles.meta}>
+                        <span className={styles.filename} title={file.filename}>{file.filename}</span>
+                        <div className={styles.actions}>
+                          {file.url && ["image", "video", "audio"].includes(file.type) && (
+                            <button
+                              className={styles.iconBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleWatch(file);
+                              }}
+                              title="xem"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          )}
+                          {file.downloadUrl && (
+                            <button
+                              className={styles.iconBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadFile(file);
+                              }}
+                              disabled={downloading === file.id}
+                              title="Tải xuống"
+                            >
+                              <Download size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-              <h3>📄 Chi tiết tệp</h3>
               {
-                isEdit ? (
-                  <>
-                    <div className={styles.field}>
-                      <label>Tên tệp</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder="Nhập tên..."
-                        value={name || clickedFile.name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                    <div className={styles.field}>
-                      <label>Mô tả</label>
-                      <textarea
-                        className={styles.textarea}
-                        placeholder="Nhập mô tả..."
-                        value={description || clickedFile.description}
-                        onChange={(e) => setDescription(e.target.value)}
-                      />
-                    </div>
-                    <div className={styles.miniActions}>
-                      <button onClick={handleCancelEdit} className={styles.cancelBtn}><X size={18} /></button>
-                      <button onClick={handleConfirmEdit} className={styles.saveBtn}><Check size={18} /></button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p><strong>Tên:</strong> {clickedFile.name || "Không có"}</p>
-                    <p><strong>Mô tả:</strong> {clickedFile.description || "Không có"}</p>
-                  </>
+                pagination.totalPages > 1 && (
+                  <div className={styles.pagingWrapper}>
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      totalItems={pagination.total}
+                      itemsPerPage={pagination.limit}
+                      onPageChange={goToPage}
+                      onLimitChange={changeLimit}
+                      isLoading={filtering}
+                      showLimitSelector={true}
+                      showPageInfo={true}
+                      showItemInfo={true}
+                      limitOptions={[10, 20, 50, 100]}
+                      maxPageButtons={5}
+                    />
+                  </div>
                 )
               }
-              <p><strong>Tên Tệp:</strong> {clickedFile.filename}</p>
-              <p><strong>Người tạo:</strong> {clickedFile.ownerName || "Không có"}</p>
-              <p><strong>Loại:</strong> {clickedFile.type}</p>
-              <p><strong>Kích thước:</strong> {(clickedFile.size / 1024).toFixed(1)} KB</p>
-              <p><strong>Ngày tải lên:</strong> {new Date(clickedFile.createdAt).toLocaleString()}</p>
-              <p><strong>Thẻ:</strong></p>
-              <ClassSelector selected={clickedFile.classes} onChange={(newClasses) => handleClassesChange(clickedFile.id, newClasses)} fixedClasses={classMate ? clickedFile.classes : null} />
-            </motion.div>
+            </>
           )}
-        </AnimatePresence>
+        </div>
 
-        {/* MODAL UPLOAD */}
-        <Modal isOpen={isModalOpen} onClose={handleModalClose} title="Tải tệp mới" width="500px">
-          <div className={styles.form}>
-            <FileUploader onFileSelect={setSelectedFile} accept={accept || "*/*"} />
-            <div className={styles.field}>
-              <label>Tên tệp</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="Nhập tên..."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+        {/* RIGHT SIDE */}
+        <div className={styles.rightPane}>
+          {/* FILE INFO SECTION */}
+          <AnimatePresence>
+            {clickedFile && (
+              <motion.div
+                className={styles.fileDetail}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className={styles.sideActions}>
+                  {
+                    ["image", "video", "audio"].includes(clickedFile.type) && (
+                      <button
+                        onClick={() => handleWatch(clickedFile)}
+                        className={styles.viewBtn}
+                      >
+                        <Eye size={18} />
+                      </button>
+                    )
+                  }
+                  <button
+                    onClick={() => downloadFile(clickedFile)}
+                    className={styles.viewBtn}
+                  >
+                    <Download size={18} />
+                  </button>
+                  <button
+                    onClick={handleEditClick}
+                    className={styles.viewBtn}
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className={styles.deleteBtn}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+                <h3>📄 Chi tiết tệp</h3>
+                {
+                  isEdit ? (
+                    <>
+                      <div className={styles.field}>
+                        <label>Tên tệp</label>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder="Nhập tên..."
+                          value={name || clickedFile.name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.field}>
+                        <label>Mô tả</label>
+                        <textarea
+                          className={styles.textarea}
+                          placeholder="Nhập mô tả..."
+                          value={description || clickedFile.description}
+                          onChange={(e) => setDescription(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.miniActions}>
+                        <button onClick={handleCancelEdit} className={styles.cancelBtn}><X size={18} /></button>
+                        <button onClick={handleConfirmEdit} className={styles.saveBtn}><Check size={18} /></button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p><strong>Tên:</strong> {clickedFile.name || "Không có"}</p>
+                      <p><strong>Mô tả:</strong> {clickedFile.description || "Không có"}</p>
+                    </>
+                  )
+                }
+                <p><strong>Tên Tệp:</strong> {clickedFile.filename}</p>
+                <p><strong>Người tạo:</strong> {clickedFile.ownerName || "Không có"}</p>
+                <p><strong>Loại:</strong> {clickedFile.type}</p>
+                <p><strong>Kích thước:</strong> {(clickedFile.size / 1024).toFixed(1)} KB</p>
+                <p><strong>Ngày tải lên:</strong> {new Date(clickedFile.createdAt).toLocaleString()}</p>
+                <p><strong>Thẻ:</strong></p>
+                <ClassSelector selected={clickedFile.classes} onChange={(newClasses) => handleClassesChange(clickedFile.id, newClasses)} fixedClasses={classMate ? clickedFile.classes : null} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* MODAL UPLOAD */}
+          <Modal isOpen={isModalOpen} onClose={handleModalClose} title="Tải tệp mới" width="500px">
+            <div className={styles.form}>
+              <FileUploader onFileSelect={setSelectedFile} accept={accept || "*/*"} />
+              <div className={styles.field}>
+                <label>Tên tệp</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="Nhập tên..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className={styles.field}>
+                <label>Mô tả</label>
+                <textarea
+                  className={styles.textarea}
+                  placeholder="Nhập mô tả..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+              <ClassSelector selected={classes} onChange={setClasses} fixedClasses={classMate ? classes : null} />
+              {error && <p className={styles.error}>{error}</p>}
+              {data?.success && <p className={styles.success}>Tải lên thành công!</p>}
             </div>
-            <div className={styles.field}>
-              <label>Mô tả</label>
-              <textarea
-                className={styles.textarea}
-                placeholder="Nhập mô tả..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+            <div className={styles.modalFooter}>
+              <button
+                disabled={loading || !selectedFile}
+                className={`${styles.submitBtn} ${styles.button}`}
+                onClick={handleUpload}
+              >
+                {loading ? "Đang tải lên..." : "Tải lên"}
+              </button>
             </div>
-            <ClassSelector selected={classes} onChange={setClasses} fixedClasses={classMate ? classes : null} />
-            {error && <p className={styles.error}>{error}</p>}
-            {data?.success && <p className={styles.success}>Tải lên thành công!</p>}
-          </div>
-          <div className={styles.modalFooter}>
-            <button
-              disabled={loading || !selectedFile}
-              className={`${styles.submitBtn} ${styles.button}`}
-              onClick={handleUpload}
-            >
-              {loading ? "Đang tải lên..." : "Tải lên"}
-            </button>
-          </div>
-        </Modal>
-        <DeleteModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          title="Xóa tệp"
-          message={<p>Bạn có chắc chắn muốn xóa tệp?</p>}
-          onConfirm={handleDeleteConfirm}
-        />
+          </Modal>
+          <DeleteModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            title="Xóa tệp"
+            message={<p>Bạn có chắc chắn muốn xóa tệp?</p>}
+            onConfirm={handleDeleteConfirm}
+          />
+        </div>
       </div>
-    </div>
     </>
   );
 }

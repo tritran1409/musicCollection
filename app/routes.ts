@@ -26,4 +26,7 @@ export default [
     route("api/filterFile", "routes/actions/filterFile.jsx"),
     route("api/lesson", "routes/actions/lesson.jsx"),
     route("api/document", "routes/actions/document.jsx"),
+    route("api/document/pdf/:documentId", "routes/actions/exportPDF.jsx"),
+    route("api/document/word/:documentId", "routes/actions/exportWord.jsx"),
+    route("api/document/filter", "routes/actions/documentFilter.jsx"),
 ] satisfies RouteConfig;

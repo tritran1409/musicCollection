@@ -5,7 +5,7 @@ import { getUser } from '../../service/auth.server';
 export async function action({ request }) {
   // Kiểm tra authentication
   const user = await getUser(request);
-  
+
   const formData = await request.formData();
   const intent = formData.get('intent');
   const documentModel = new DocumentModel();
@@ -14,7 +14,7 @@ export async function action({ request }) {
     switch (intent) {
       case 'delete': {
         const documentId = formData.get('documentId');
-        
+
         if (!documentId) {
           return {
             error: 'Document ID is required',
@@ -24,7 +24,7 @@ export async function action({ request }) {
 
         // Kiểm tra quyền sở hữu document
         const document = await documentModel.findById(documentId);
-        
+
         if (!document) {
           return {
             error: 'Document not found',
@@ -78,7 +78,7 @@ export async function action({ request }) {
 
       case 'update': {
         const documentId = formData.get('documentId');
-        
+
         if (!documentId) {
           return {
             error: 'Document ID is required',
@@ -88,7 +88,7 @@ export async function action({ request }) {
 
         // Kiểm tra quyền sở hữu
         const existingDocument = await documentModel.findById(documentId);
-        
+
         if (!existingDocument) {
           return {
             error: 'Document not found',
@@ -119,7 +119,6 @@ export async function action({ request }) {
           message: 'Document updated successfully'
         };
       }
-
       default:
         return {
           error: 'Invalid intent',

@@ -1,7 +1,7 @@
-import React from "react";
 import { useNavigate } from "react-router";
-import styles from "../../globals/styles/documentView.module.css";
 import { DocumentModel } from "../../.server/document.repo";
+import styles from "../../globals/styles/documentView.module.css";
+import { useDocumentExport } from "../../hooks/useDownloadDoc";
 
 /**
  * DocumentViewer - Hiển thị nội dung tài liệu đã lưu
@@ -17,6 +17,7 @@ export async function loader({ params }) {
 
 export default function DocumentViewer({ loaderData }) {
   const { document } = loaderData;
+  const { downloadPDF, downloadWord, downloadingPdf, downloadingWord } = useDocumentExport();
   const navigate = useNavigate();
 
   if (!document) {
@@ -25,7 +26,7 @@ export default function DocumentViewer({ loaderData }) {
         <div className={styles.errorBox}>
           <h1>❌ Không tìm thấy tài liệu</h1>
           <p>Tài liệu bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
-          <button 
+          <button
             className={styles.backButton}
             onClick={() => navigate(-1)}
           >
@@ -60,18 +61,32 @@ export default function DocumentViewer({ loaderData }) {
     <div className={styles.viewerWrapper}>
       {/* Header với actions */}
       <div className={styles.viewerHeader}>
-        <button 
+        <button
           className={styles.backBtn}
           onClick={handleBack}
         >
           ← Quay lại
         </button>
-        <button 
-          className={styles.editBtn}
-          onClick={handleEdit}
-        >
-          ✏️ Chỉnh sửa
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className={styles.editBtn}
+            onClick={() => downloadPDF(document.id)}
+          >
+            {downloadingPdf === document.id ? 'Đang tải...' : '📕 Tải về PDF'}
+          </button>
+          <button
+            className={styles.editBtn}
+            onClick={() => downloadWord(document.id)}
+          >
+            {downloadingWord === document.id ? 'Đang tải...' : '📖 Tải về Word'}
+          </button>
+          <button
+            className={styles.editBtn}
+            onClick={handleEdit}
+          >
+            ✏️ Chỉnh sửa
+          </button>
+        </div>
       </div>
 
       {/* Document Container */}
@@ -79,7 +94,7 @@ export default function DocumentViewer({ loaderData }) {
         {/* Title Section */}
         <header className={styles.documentHeader}>
           <h1 className={styles.documentTitle}>{document.title}</h1>
-          
+
           {document.description && (
             <p className={styles.documentDescription}>
               {document.description}
@@ -100,7 +115,7 @@ export default function DocumentViewer({ loaderData }) {
                 </div>
               </div>
             )}
-            
+
             {document.createdAt && (
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>📅 Ngày tạo:</span>
@@ -109,7 +124,7 @@ export default function DocumentViewer({ loaderData }) {
                 </span>
               </div>
             )}
-            
+
             {document.updatedAt && document.updatedAt !== document.createdAt && (
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>🔄 Cập nhật:</span>
@@ -125,7 +140,7 @@ export default function DocumentViewer({ loaderData }) {
         <hr className={styles.divider} />
 
         {/* Content Section */}
-        <div 
+        <div
           className={styles.documentContent}
           dangerouslySetInnerHTML={{ __html: document.content }}
         />
@@ -133,13 +148,13 @@ export default function DocumentViewer({ loaderData }) {
 
       {/* Footer Actions */}
       <footer className={styles.viewerFooter}>
-        <button 
+        <button
           className={styles.backBtnLarge}
           onClick={handleBack}
         >
           ← Quay lại danh sách
         </button>
-        <button 
+        <button
           className={styles.editBtnLarge}
           onClick={handleEdit}
         >

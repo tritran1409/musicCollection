@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useFetcherWithReset } from "./useFetcherWithReset";
 import { deepEqual } from "../helper/dataHelper";
 
-export default function useFilter(
+export default function useDocumentFilter(
   initialData = null,
   endpoint = null,
   initialPage = 1,
@@ -19,15 +19,15 @@ export default function useFilter(
   const [data, setData] = useState(initialData);
 
   const [activeFilters, setActiveFilters] = useState({
-    search: initialFilters.search || "",
-    types: initialFilters.types || [],
-    classes: initialFilters.classes || [],
+    searchText: initialFilters.searchText || "",
+    type: initialFilters.type || "all",
+    categoryId: initialFilters.categoryId || "",
+    dateRange: initialFilters.dateRange || "all",
     dateFrom: initialFilters.dateFrom || "",
     dateTo: initialFilters.dateTo || "",
+    sortBy: initialFilters.sortBy || "createdAt-desc",
     owner: initialFilters.owner || "",
-    category: initialFilters.category || "",
-    minSize: initialFilters.minSize || "",
-    maxSize: initialFilters.maxSize || "",
+    tags: initialFilters.tags || [],
   });
 
   const [pagination, setPagination] = useState({
@@ -41,6 +41,17 @@ export default function useFilter(
   useEffect(() => {
     setInitData(initialData);
     setData(initialData);
+    setActiveFilters({
+        searchText: initialFilters.searchText || "",
+        type: initialFilters.type || "all",
+        categoryId: initialFilters.categoryId || "",
+        dateRange: initialFilters.dateRange || "all",
+        dateFrom: initialFilters.dateFrom || "",
+        dateTo: initialFilters.dateTo || "",
+        sortBy: initialFilters.sortBy || "createdAt-desc",
+        owner: initialFilters.owner || "",
+        tags: initialFilters.tags || [],
+    });
     setPagination({ page: initialPage, limit: initialLimit });
   }, [key]);
 
@@ -55,8 +66,11 @@ export default function useFilter(
   // 🔎 Gửi request filter lên server
   const filter = (filters, resetPage = true) => {
     if (!endpoint) return console.warn("No endpoint provided for filter");
-    const newFilters = { ...activeFilters, ...filters };
     
+    const newFilters = { ...activeFilters, ...filters };
+    console.log(newFilters, initialFilters);
+    
+    // Nếu filter giống với initial -> trả về data gốc
     if (deepEqual(newFilters, initialFilters)) {
       setData(initialData);
       setActiveFilters(newFilters);
@@ -77,11 +91,15 @@ export default function useFilter(
         ...newFilters,
         page: newPagination.page,
         limit: newPagination.limit,
-        classes: JSON.stringify(newFilters.classes),
-        types: JSON.stringify(newFilters.types),
+        tags: JSON.stringify(newFilters.tags),
       },
       { method: "post", action: endpoint }
     );
+  };
+
+  // 🔄 Quick filter - chỉ cập nhật một field
+  const quickFilter = (key, value) => {
+    filter({ [key]: value }, true);
   };
 
   // 📄 Pagination helpers
@@ -94,8 +112,7 @@ export default function useFilter(
         ...activeFilters,
         page,
         limit: pagination.limit,
-        classes: JSON.stringify(activeFilters.classes),
-        types: JSON.stringify(activeFilters.types),
+        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -110,8 +127,7 @@ export default function useFilter(
         ...activeFilters,
         page: 1,
         limit,
-        classes: JSON.stringify(activeFilters.classes),
-        types: JSON.stringify(activeFilters.types),
+        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -131,15 +147,15 @@ export default function useFilter(
     if (!endpoint) return;
 
     const emptyFilters = {
-      search: "",
-      types: [],
-      classes: [],
-      dateFrom: null,
-      dateTo: null,
+      searchText: "",
+      type: "all",
+      categoryId: "",
+      dateRange: "all",
+      dateFrom: "",
+      dateTo: "",
+      sortBy: "createdAt-desc",
       owner: "",
-      category: "",
-      minSize: "",
-      maxSize: "",
+      tags: [],
     };
 
     if (deepEqual(activeFilters, emptyFilters)) return;
@@ -153,55 +169,83 @@ export default function useFilter(
         ...emptyFilters,
         page: 1,
         limit: pagination.limit,
-        classes: JSON.stringify([]),
-        types: JSON.stringify([]),
+        tags: JSON.stringify([]),
       },
       { method: "post", action: endpoint }
     );
   };
 
+  // 🔍 Check if has active filters
   const hasActiveFilters = () => {
     const empty = {
-      search: "",
-      types: [],
-      classes: [],
-      dateFrom: null,
-      dateTo: null,
+      searchText: "",
+      type: "all",
+      categoryId: "",
+      dateRange: "all",
+      dateFrom: "",
+      dateTo: "",
+      sortBy: "createdAt-desc",
       owner: "",
-      category: "",
-      minSize: "",
-      maxSize: "",
+      tags: [],
     };
     return !deepEqual(activeFilters, empty);
   };
+
+  // 🔄 Re-fetch with current filters
   const reFetch = () => {
+    if (!endpoint) return;
     fetcher.submit(
       {
         intent: "filter",
         ...activeFilters,
         page: pagination.page,
         limit: pagination.limit,
-        classes: JSON.stringify(activeFilters.classes),
-        types: JSON.stringify(activeFilters.types),
+        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
   };
+
   // 📊 Pagination info
   const totalPages = Math.ceil((data?.total || 0) / pagination.limit);
   const hasNextPage = pagination.page < totalPages;
   const hasPreviousPage = pagination.page > 1;
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
   const endIndex = Math.min(pagination.page * pagination.limit, data?.total || 0);
+
+  // 🎯 Get active filter count
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (activeFilters.searchText.trim()) count++;
+    if (activeFilters.type !== "all") count++;
+    if (activeFilters.categoryId) count++;
+    if (activeFilters.dateRange !== "all") count++;
+    if (activeFilters.dateFrom || activeFilters.dateTo) count++;
+    if (activeFilters.sortBy !== "createdAt-desc") count++;
+    if (activeFilters.owner) count++;
+    if (activeFilters.tags && activeFilters.tags.length > 0) count++;
+    return count;
+  };
+
   return {
+    // 🔧 Filter methods
     filter,
+    quickFilter,
     resetFilters,
-    initData, // 🔹 giữ nguyên để debug/so sánh khi cần
-    filterResult: data?.files || [],
+    reFetch,
+
+    // 📊 Data
+    initData,
+    documents: data?.documents || [],
     filtering: isLoading,
     error: data?.error || null,
+
+    // 🎛️ Filter state
     activeFilters,
     hasActiveFilters: hasActiveFilters(),
+    activeFilterCount: getActiveFilterCount(),
+
+    // 📄 Pagination
     pagination: {
       page: pagination.page,
       limit: pagination.limit,

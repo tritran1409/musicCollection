@@ -1,0 +1,382 @@
+/* Pagination Container */
+.paginationContainer {
+  position: relative;
+  margin-top: 24px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Info Bar */
+.infoBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.itemInfo {
+  font-size: 14px;
+  color: #666;
+}
+
+.itemInfo strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Limit Selector */
+.limitSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.limitSelect {
+  padding: 6px 32px 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.limitSelect:hover:not(:disabled) {
+  border-color: #999;
+}
+
+.limitSelect:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.limitSelect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+/* Pagination Controls */
+.paginationControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Navigation Buttons */
+.navButton {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #fafafa;
+}
+
+.previousButton {
+  margin-right: 4px;
+}
+
+.nextButton {
+  margin-left: 4px;
+}
+
+/* Page Numbers Container */
+.pageNumbers {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Page Buttons */
+.pageButton {
+  min-width: 40px;
+  height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.pageButton:hover:not(:disabled):not(.activePage) {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.activePage {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+  cursor: default;
+  font-weight: 600;
+}
+
+.activePage:hover {
+  background: #007bff;
+  border-color: #007bff;
+}
+
+/* Ellipsis */
+.ellipsis {
+  padding: 8px 4px;
+  color: #999;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Go to Page Section */
+.goToPage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.goToPageForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.pageInput {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.pageInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.pageInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.goButton {
+  padding: 6px 16px;
+  border: 1px solid #007bff;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.goButton:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.goButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Loading Overlay */
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  font-size: 18px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .paginationContainer {
+    padding: 12px;
+  }
+
+  .infoBar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .paginationControls {
+    gap: 4px;
+  }
+
+  .pageButton {
+    min-width: 36px;
+    height: 36px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .navButton {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .pageNumbers {
+    gap: 2px;
+  }
+
+  .goToPage {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .goToPageForm {
+    width: 100%;
+  }
+
+  .pageInput {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageButton {
+    min-width: 32px;
+    height: 32px;
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .navButton {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .itemInfo,
+  .limitSelector,
+  .pageInfo,
+  .goToPageForm {
+    font-size: 13px;
+  }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  .paginationContainer {
+    background: #1a1a1a;
+    border-color: #333;
+  }
+
+  .navButton,
+  .pageButton {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #e0e0e0;
+  }
+
+  .navButton:hover:not(:disabled):not(.activePage),
+  .pageButton:hover:not(:disabled):not(.activePage) {
+    background: #3a3a3a;
+    border-color: #555;
+  }
+
+  .activePage {
+    background: #0d6efd;
+    border-color: #0d6efd;
+  }
+
+  .itemInfo,
+  .limitSelector,
+  .pageInfo,
+  .goToPageForm {
+    color: #b0b0b0;
+  }
+
+  .itemInfo strong {
+    color: #e0e0e0;
+  }
+
+  .limitSelect,
+  .pageInput {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #e0e0e0;
+  }
+
+  .infoBar,
+  .goToPage {
+    border-color: #333;
+  }
+}

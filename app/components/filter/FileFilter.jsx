@@ -19,10 +19,15 @@ export const FileFilter = ({ onFilterChange, initialFilters = {}, disabledFilter
   const isDisabled = (field) => disabledFilters.includes(field);
   const [isExpanded, setIsExpanded] = useState(false);
   const { customCategories } = useCategories();
-  const categories = (customCategories || []).map((category) => ({
-    value: category.id,
-    label: category.name,
-  }));
+  const categories = (customCategories || []).map((category) => {
+    if (category.rootPath === '/suu-tap') {
+      return {
+        value: category.id,
+        label: category.name,
+      };
+    }
+    return null;
+  }).filter(Boolean);
 
   // File types phổ biến
   const fileTypes = [
