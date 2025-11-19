@@ -662,3 +662,12 @@
 .deleteDetailButton:hover {
   background: #d32f2f;
 }
+.sectionLabelRow {
+  background: #f5f5f5;
+}
+
+.sectionLabel {
+  font-weight: bold;
+  padding: 8px 12px;
+  color: #444;
+}

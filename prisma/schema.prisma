@@ -90,7 +90,8 @@ model Lesson {
   ownerName   String
   
   fileIds     String[]  @db.ObjectId @default([])
-  
+  documentIds String[] @db.ObjectId @default([])
+
   classId     Int?
   
   createdAt   DateTime  @default(now())

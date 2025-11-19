@@ -14,7 +14,6 @@ async function handleDocumentFilter(formData, params) {
     // 📥 Parse filter parameters
     const filters = {
       searchText: formData.get("searchText") || "",
-      type: formData.get("type") || "all",
       categoryId: formData.get("categoryId") || params.categoryId || null,
       dateRange: formData.get("dateRange") || "all",
       dateFrom: formData.get("dateFrom") || null,
@@ -79,11 +78,6 @@ function buildWhereClause(filters) {
   // Filter by category
   if (filters.categoryId && filters.categoryId !== "all") {
     whereClause.categoryId = filters.categoryId;
-  }
-
-  // Filter by document type (nếu có field type)
-  if (filters.type && filters.type !== "all") {
-    whereClause.type = filters.type;
   }
 
   // Filter by owner

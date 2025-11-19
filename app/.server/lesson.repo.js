@@ -20,7 +20,7 @@ export class LessonModel extends BaseModel {
       orderBy: { createdAt: "desc" },
     });
 
-    return this.populateFilesForLessons(lessons);
+    return this.populateFilesAndDocumentsForLessons(lessons);
   }
 
   async findByOwnerId(ownerId) {
@@ -38,7 +38,7 @@ export class LessonModel extends BaseModel {
       orderBy: { createdAt: "desc" },
     });
 
-    return this.populateFilesForLessons(lessons);
+    return this.populateFilesAndDocumentsForLessons(lessons);
   }
 
   async findById(id) {
@@ -57,26 +57,14 @@ export class LessonModel extends BaseModel {
 
     if (!lesson) return null;
 
-    const [populatedLesson] = await this.populateFilesForLessons([lesson]);
+    const [populatedLesson] = await this.populateFilesAndDocumentsForLessons([lesson]);
     return populatedLesson;
   }
 
-  async populateFilesForLessons(lessons) {
-    if (!lessons || lessons.length === 0) return lessons;
-
-    const allFileIds = lessons.flatMap(lesson => lesson.fileIds || []);
-    const uniqueFileIds = [...new Set(allFileIds)];
-
-    if (uniqueFileIds.length === 0) {
-      return lessons.map(lesson => ({ ...lesson, files: [] }));
-    }
-
-    const files = await prisma.file.findMany({
-      where: {
-        id: { in: uniqueFileIds },
-      },
+  async findByClass(classId) {
+    const lessons = await this.model.findMany({
+      where: { classId },
       include: {
-        category: true,
         owner: {
           select: {
             id: true,
@@ -85,19 +73,86 @@ export class LessonModel extends BaseModel {
           },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
+    
+    return this.populateFilesAndDocumentsForLessons(lessons);
+  }
 
-    const filesMap = new Map(files.map(file => [file.id, file]));
+  /**
+   * Populate both files and documents for lessons
+   */
+  async populateFilesAndDocumentsForLessons(lessons) {
+    if (!lessons || lessons.length === 0) return lessons;
 
+    // Populate files
+    const allFileIds = lessons.flatMap(lesson => lesson.fileIds || []);
+    const uniqueFileIds = [...new Set(allFileIds)];
+
+    let filesMap = new Map();
+    if (uniqueFileIds.length > 0) {
+      const files = await prisma.file.findMany({
+        where: {
+          id: { in: uniqueFileIds },
+        },
+        include: {
+          category: true,
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+      filesMap = new Map(files.map(file => [file.id, file]));
+    }
+
+    // Populate documents
+    const allDocumentIds = lessons.flatMap(lesson => lesson.documentIds || []);
+    const uniqueDocumentIds = [...new Set(allDocumentIds)];
+
+    let documentsMap = new Map();
+    if (uniqueDocumentIds.length > 0) {
+      const documents = await prisma.document.findMany({
+        where: {
+          id: { in: uniqueDocumentIds },
+        },
+        include: {
+          category: true,
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+      documentsMap = new Map(documents.map(doc => [doc.id, doc]));
+    }
+
+    // Map files and documents to lessons
     return lessons.map(lesson => ({
       ...lesson,
       files: (lesson.fileIds || [])
         .map(fileId => filesMap.get(fileId))
         .filter(Boolean),
+      documents: (lesson.documentIds || [])
+        .map(docId => documentsMap.get(docId))
+        .filter(Boolean),
     }));
   }
 
-  async createLesson({ title, description, ownerId, classId, fileIds = [] }) {
+  async createLesson({ 
+    title, 
+    description, 
+    ownerId, 
+    classId, 
+    fileIds = [], 
+    documentIds = [] 
+  }) {
     // Validate owner exists
     const owner = await prisma.user.findUnique({
       where: { id: ownerId },
@@ -115,6 +170,18 @@ export class LessonModel extends BaseModel {
         throw new Error("Some files not found");
       }
     }
+
+    // Validate documents exist
+    if (documentIds.length > 0) {
+      const documentsCount = await prisma.document.count({
+        where: { id: { in: documentIds } },
+      });
+      
+      if (documentsCount !== documentIds.length) {
+        throw new Error("Some documents not found");
+      }
+    }
+
     const lesson = await this.model.create({
       data: {
         title,
@@ -123,6 +190,7 @@ export class LessonModel extends BaseModel {
         ownerName: owner.name,
         classId,
         fileIds,
+        documentIds,
       },
       include: {
         owner: {
@@ -135,11 +203,18 @@ export class LessonModel extends BaseModel {
       },
     });
 
-    const [populatedLesson] = await this.populateFilesForLessons([lesson]);
+    const [populatedLesson] = await this.populateFilesAndDocumentsForLessons([lesson]);
     return populatedLesson;
   }
 
-  async updateLesson(id, { title, description, ownerId, classId, fileIds }) {
+  async updateLesson(id, { 
+    title, 
+    description, 
+    ownerId, 
+    classId, 
+    fileIds, 
+    documentIds 
+  }) {
     const data = {};
     
     if (title !== undefined) data.title = title;
@@ -157,6 +232,7 @@ export class LessonModel extends BaseModel {
       data.ownerName = owner.name;
     }
     
+    // Validate and update files
     if (fileIds !== undefined) {
       if (fileIds.length > 0) {
         const filesCount = await prisma.file.count({
@@ -175,6 +251,25 @@ export class LessonModel extends BaseModel {
       data.fileIds = fileIds;
     }
 
+    // Validate and update documents
+    if (documentIds !== undefined) {
+      if (documentIds.length > 0) {
+        const documentsCount = await prisma.document.count({
+          where: { id: { in: documentIds } },
+        });
+        
+        if (documentsCount !== documentIds.length) {
+          throw new Error("Some documents not found");
+        }
+      }
+
+      if (documentIds.length > 10) {
+        throw new Error("Maximum 10 documents allowed per lesson");
+      }
+
+      data.documentIds = documentIds;
+    }
+
     const lesson = await this.model.update({
       where: { id },
       data,
@@ -189,7 +284,7 @@ export class LessonModel extends BaseModel {
       },
     });
 
-    const [populatedLesson] = await this.populateFilesForLessons([lesson]);
+    const [populatedLesson] = await this.populateFilesAndDocumentsForLessons([lesson]);
     return populatedLesson;
   }
 
@@ -197,22 +292,6 @@ export class LessonModel extends BaseModel {
     return this.model.delete({
       where: { id },
     });
-  }
-
-  async findByClass (classId) {
-    const lessons = await this.model.findMany({
-      where: { classId },
-      include: {
-        owner: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-    return this.populateFilesForLessons(lessons);
   }
 }
 

@@ -15,7 +15,7 @@ export default function DocumentFilterAdvanced({
     const [searchValue, setSearchValue] = useState(activeFilters.searchText || "");
     const searchInputRef = useRef(null);
     const { customCategories } = useCategories();
-    const categories = customCategories.map((category) => {
+    const categoryTemps = customCategories.map((category) => {
         if (category.rootPath === '/thong-tin-suu-tam') {
             return {
                 value: category.id,
@@ -24,6 +24,7 @@ export default function DocumentFilterAdvanced({
         }
         return null;
     }).filter((category) => category !== null);
+    const categories = [{value: 'all', label: 'Tất cả'}, ...categoryTemps ];
     const isDisabled = (filter) => {
         return isLoading || disabledFilters.includes(filter);
     };
@@ -49,7 +50,6 @@ export default function DocumentFilterAdvanced({
     const checkActiveFilterCount = () => {
         let count = 0;
         if (activeFilters.searchText.trim() && !disabledFilters.includes('searchText')) count++;
-        if (activeFilters.type !== "all" && !disabledFilters.includes('type')) count++;
         if (activeFilters.category && !disabledFilters.includes('category')) count++;
         if (activeFilters.dateRange !== "all" && !disabledFilters.includes('dateRange')) count++;
         if (activeFilters.dateFrom || activeFilters.dateTo && !disabledFilters.includes('dateFrom') && !disabledFilters.includes('dateTo')) count++;
@@ -112,8 +112,8 @@ export default function DocumentFilterAdvanced({
                             <label className={styles.filterLabel}>📑 Loại tài liệu</label>
                             <select
                                 className={styles.filterSelect}
-                                value={activeFilters.type || "all"}
-                                onChange={(e) => onFilterChange({ ...activeFilters, type: e.target.value })}
+                                value={activeFilters.categoryId || "all"}
+                                onChange={(e) => onFilterChange({ ...activeFilters, categoryId: e.target.value })}
                                 disabled={isDisabled('category')}
                             >
                                 {categories.map((category) => (

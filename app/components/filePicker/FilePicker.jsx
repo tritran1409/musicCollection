@@ -24,7 +24,7 @@ const fileTypeMap = {
 };
 
 export default function FilePicker({ selectedFiles, onSelectFiles, multiple = false, fileType = "raw", category = null, classMate = null }) {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // init filter
   const initFilterGenerator = useMemo(() => {

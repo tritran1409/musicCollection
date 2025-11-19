@@ -234,7 +234,6 @@
 
 .removeDetailButton {
   width: 100%;
-  margin-top: 16px;
   padding: 10px;
   background: #ff4444;
   color: white;
@@ -440,4 +439,32 @@
   background: #ccc;
   cursor: not-allowed;
   transform: none;
+}
+.editDetailButton {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+.actionBtnContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.detailActionBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editDetailButton:hover {
+    background-color: #dbeafe;
+    transform: translateX(4px);
 }

@@ -30,7 +30,6 @@ export default function DocumentList({ loaderData }) {
   const disabledFilters = ['category'];
   const initialFilters = {
     searchText: '',
-    type: 'all',
     categoryId: categoryId ? categoryId : '',
     dateRange: 'all',
     dateFrom: '',
