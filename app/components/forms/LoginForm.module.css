@@ -54,16 +54,19 @@
 .button:hover {
   background-color: #1e40af;
 }
+
 .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .title {
   text-align: center;
   font-family: 'Pacifico', cursive;
   font-size: 2.2rem;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1.8rem;
@@ -92,7 +95,62 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-2px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .form {
+    width: 90%;
+    max-width: 400px;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .form {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .field label {
+    font-size: 0.85rem;
+  }
+
+  .field input,
+  .field select {
+    padding: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .button {
+    padding: 0.6rem;
+    font-size: 0.95rem;
+  }
+}

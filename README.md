@@ -34,6 +34,37 @@ npm run dev
 
 Your application will be available at `http://localhost:5173`.
 
+## Configuration
+
+### Email Setup
+
+This application uses email notifications for user registration and admin alerts. To enable email functionality, configure the following environment variables:
+
+```bash
+# SMTP Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+
+# Email Display Settings
+SMTP_FROM_NAME=Music Collection
+SMTP_FROM_EMAIL=your-email@gmail.com
+
+# Admin Email (receives notifications when teachers register)
+ADMIN_EMAIL=admin@example.com
+
+# Application URL
+APP_URL=http://localhost:5173
+```
+
+**Note:** 
+- For Gmail, you need to use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password
+- The `ADMIN_EMAIL` will receive notifications whenever a new teacher registers and needs approval
+- If `ADMIN_EMAIL` is not set, it will default to `SMTP_USER`
+
+
 ## Building for Production
 
 Create a production build:

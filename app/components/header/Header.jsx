@@ -1,81 +1,16 @@
 import { Music2, Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Form, Link, useNavigate } from "react-router";
+import { useState } from "react";
+import { Form, useNavigate } from "react-router";
 import styles from "../../globals/styles/main.module.css";
-import useFilter from "../../hooks/useFileFilter";
-const initFilterGenerator = {
-  search: "",
-  types: [],
-  classes: [],
-  dateFrom: "",
-  dateTo: "",
-  owner: "",
-  category: "",
-  minSize: "",
-  maxSize: "",
-};
 
-export default function Header({ user, }) {
+export default function Header({ user }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-    const { 
-      filterResult, 
-      filtering, 
-      filter,
-      pagination,
-      nextPage,
-      previousPage,
-      goToPage,
-      changeLimit,
-      resetFilters,
-      activeFilters,
-    } = useFilter(null, '/api/filterFile', 1, 20, initFilterGenerator, `search`);
 
-  useEffect(() => {
-    if (!open) {
-      setQuery("");
-      return;
-    }
-    const delay = setTimeout(async () => {
-      filter({
-        ...initFilterGenerator,
-        search: query,
-      });
-    }, 300);
-
-    return () => clearTimeout(delay);
-  }, [query, open]);
-
-  const renderThumb = (item) => {
-    if (item.type === "image")
-      return <img className={styles.searchItemThumb} src={item.url} />;
-
-    if (item.type === "video")
-      return <video className={styles.searchItemThumb} src={item.url} muted />;
-
-    const icon = {
-      audio: "🎵",
-      pdf: "📄",
-      file: "📁",
-      zip: "🗂️",
-    };
-
-    return <div className={styles.searchItemIcon}>{icon[item.type] || "📦"}</div>;
-  };
-
-  const onDownload = (file) => {
-    
-  }
-
-  const onCopy = (file) => {
-    
-  }
-
-  const onSearch = () => {
+  const handleNavigate = (path) => {
     setOpen(false);
-    navigate(`/bang-dieu-khien/tim-kiem`);
-  }
+    navigate(path);
+  };
 
   return (
     <>
@@ -90,6 +25,7 @@ export default function Header({ user, }) {
           <button
             className={styles.searchButton}
             onClick={() => setOpen(true)}
+            title="Tìm kiếm"
           >
             <Search size={20} color="#fff" />
           </button>
@@ -103,74 +39,61 @@ export default function Header({ user, }) {
         </div>
       </header>
 
-      {/* Modal search */}
+      {/* Modal search selection */}
       {open && (
         <div className={styles.searchModalOverlay} onClick={() => setOpen(false)}>
           <div
             className={styles.searchModal}
             onClick={(e) => e.stopPropagation()}
+            style={{ padding: '24px', height: 'auto', maxHeight: '80vh', width: '500px', overflow: 'auto' }}
           >
-            {/* Input trong modal */}
-            <div className={styles.searchInputContainer}>
-              <Search className={styles.searchInputIcon} size={18} />
-              <input
-                autoFocus
-                className={styles.searchInputInner}
-                placeholder="Tìm kiếm..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
+            <h3 style={{ marginBottom: '20px', fontSize: '1.25rem', fontWeight: '600', textAlign: 'center', color: '#1f2937' }}>
+              Chọn loại tìm kiếm
+            </h3>
 
-            {/* List kết quả */}
-            <div className={styles.searchResults}>
-              {filterResult.length === 0 ? (
-                <div style={{ padding: "12px 20px", color: "#6b7280" }}>
-                  Nhập để tìm kiếm...
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <button
+                onClick={() => handleNavigate('/bang-dieu-khien/tim-kiem')}
+                className={styles.searchItem}
+                style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '12px', border: '1px solid #e5e7eb', background: '#fff', width: '100%' }}
+              >
+                <div className={styles.searchItemIcon} style={{ width: '48px', height: '48px', fontSize: '24px', background: '#eff6ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  📁
                 </div>
-              ) : (
-                filterResult.map((item) => (
-                  <div key={item.id} className={styles.searchItem}>
-                    {renderThumb(item)}
+                <div className={styles.searchItemInfo} style={{ textAlign: 'left' }}>
+                  <span className={styles.searchItemName} style={{ fontSize: '1rem', color: '#111827' }}>Tìm kiếm File</span>
+                  <span className={styles.searchItemFilename} style={{ fontSize: '0.875rem', color: '#6b7280' }}>Tìm kiếm trong kho lưu trữ file</span>
+                </div>
+              </button>
 
-                    <div className={styles.searchItemInfo}>
-                      <span className={styles.searchItemName}>{item.name}</span>
-                      <span className={styles.searchItemFilename}>{item.filename}</span>
-                      <div className={styles.searchUser}>
-                        Người đăng: <span>{item.uploadedBy}</span>
-                      </div>
-                    </div>
+              <button
+                onClick={() => handleNavigate('/bang-dieu-khien/tim-kiem-tai-lieu')}
+                className={styles.searchItem}
+                style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '12px', border: '1px solid #e5e7eb', background: '#fff', width: '100%' }}
+              >
+                <div className={styles.searchItemIcon} style={{ width: '48px', height: '48px', fontSize: '24px', background: '#f0fdf4', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  📄
+                </div>
+                <div className={styles.searchItemInfo} style={{ textAlign: 'left' }}>
+                  <span className={styles.searchItemName} style={{ fontSize: '1rem', color: '#111827' }}>Tìm kiếm Tài liệu</span>
+                  <span className={styles.searchItemFilename} style={{ fontSize: '0.875rem', color: '#6b7280' }}>Tìm kiếm văn bản, tài liệu học tập</span>
+                </div>
+              </button>
 
-                    <div className={styles.searchActions}>
-                      {/* Download */}
-                      <button
-                        className={styles.searchActionBtn}
-                        onClick={() => onDownload(item)}
-                      >
-                        ⬇️
-                      </button>
-
-                      {/* Copy link */}
-                      <button
-                        className={styles.searchActionBtn}
-                        onClick={() => onCopy(item)}
-                      >
-                        📋
-                      </button>
-                    </div>
-                  </div>
-
-                ))
-              )}
-            </div>  
-              <div className={styles.searchFooter}>
-                <button
-                  onClick={onSearch}
-                  className={styles.advancedSearchBtn}
-                >
-                  🔍 Tìm kiếm nâng cao
-                </button>
-              </div>
+              <button
+                onClick={() => handleNavigate('/bang-dieu-khien/tim-kiem-bai-giang')}
+                className={styles.searchItem}
+                style={{ justifyContent: 'flex-start', padding: '16px', borderRadius: '12px', border: '1px solid #e5e7eb', background: '#fff', width: '100%' }}
+              >
+                <div className={styles.searchItemIcon} style={{ width: '48px', height: '48px', fontSize: '24px', background: '#fef2f2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  🎓
+                </div>
+                <div className={styles.searchItemInfo} style={{ textAlign: 'left' }}>
+                  <span className={styles.searchItemName} style={{ fontSize: '1rem', color: '#111827' }}>Tìm kiếm Bài giảng</span>
+                  <span className={styles.searchItemFilename} style={{ fontSize: '0.875rem', color: '#6b7280' }}>Tìm kiếm bài giảng, giáo án</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       )}

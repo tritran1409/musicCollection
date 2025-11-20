@@ -3,43 +3,43 @@ import nodemailer from "nodemailer";
 
 // Cấu hình SMTP transporter
 const createTransporter = () => {
-    // Kiểm tra xem có cấu hình SMTP không
-    if (!process.env.SMTP_HOST) {
-        console.warn("⚠️  SMTP not configured. Emails will not be sent.");
-        return null;
-    }
+  // Kiểm tra xem có cấu hình SMTP không
+  if (!process.env.SMTP_HOST) {
+    console.warn("⚠️  SMTP not configured. Emails will not be sent.");
+    return null;
+  }
 
-    return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 };
 
 /**
  * Gửi email xác thực tài khoản
  */
 export const sendVerificationEmail = async (email, name, token) => {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    if (!transporter) {
-        console.log(`📧 [DEV] Verification email would be sent to: ${email}`);
-        console.log(`🔗 Token: ${token}`);
-        return { success: false, message: "SMTP not configured" };
-    }
+  if (!transporter) {
+    console.log(`📧 [DEV] Verification email would be sent to: ${email}`);
+    console.log(`🔗 Token: ${token}`);
+    return { success: false, message: "SMTP not configured" };
+  }
 
-    const verificationUrl = `${process.env.APP_URL || "http://localhost:5173"}/verify-email?token=${token}`;
+  const verificationUrl = `${process.env.APP_URL || "http://localhost:5173"}/verify-email?token=${token}`;
 
-    const mailOptions = {
-        from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
-        to: email,
-        subject: "Xác thực tài khoản - Music Collection",
-        html: getVerificationEmailTemplate(name, verificationUrl),
-        text: `
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: email,
+    subject: "Xác thực tài khoản - Music Collection",
+    html: getVerificationEmailTemplate(name, verificationUrl),
+    text: `
 Xin chào ${name},
 
 Cảm ơn bạn đã đăng ký tài khoản tại Music Collection!
@@ -54,35 +54,35 @@ Nếu bạn không thực hiện đăng ký này, vui lòng bỏ qua email này.
 Trân trọng,
 Music Collection Team
     `,
-    };
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Verification email sent:", info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error("❌ Error sending verification email:", error);
-        throw new Error("Không thể gửi email xác thực. Vui lòng thử lại sau.");
-    }
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Verification email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Error sending verification email:", error);
+    throw new Error("Không thể gửi email xác thực. Vui lòng thử lại sau.");
+  }
 };
 
 /**
  * Gửi email thông báo tài khoản giáo viên đang chờ phê duyệt
  */
 export const sendTeacherPendingEmail = async (email, name) => {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    if (!transporter) {
-        console.log(`📧 [DEV] Teacher pending email would be sent to: ${email}`);
-        return { success: false, message: "SMTP not configured" };
-    }
+  if (!transporter) {
+    console.log(`📧 [DEV] Teacher pending email would be sent to: ${email}`);
+    return { success: false, message: "SMTP not configured" };
+  }
 
-    const mailOptions = {
-        from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
-        to: email,
-        subject: "Tài khoản đang chờ phê duyệt - Music Collection",
-        html: getTeacherPendingTemplate(name),
-        text: `
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: email,
+    subject: "Tài khoản đang chờ phê duyệt - Music Collection",
+    html: getTeacherPendingTemplate(name),
+    text: `
 Xin chào ${name},
 
 Cảm ơn bạn đã đăng ký tài khoản giáo viên tại Music Collection!
@@ -95,38 +95,38 @@ Quá trình này thường mất từ 1-2 ngày làm việc.
 Trân trọng,
 Music Collection Team
     `,
-    };
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Teacher pending email sent:", info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error("❌ Error sending teacher pending email:", error);
-        // Không throw error vì đây không phải critical
-        return { success: false, error: error.message };
-    }
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Teacher pending email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Error sending teacher pending email:", error);
+    // Không throw error vì đây không phải critical
+    return { success: false, error: error.message };
+  }
 };
 
 /**
  * Gửi email thông báo tài khoản giáo viên đã được phê duyệt
  */
 export const sendTeacherApprovedEmail = async (email, name) => {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    if (!transporter) {
-        console.log(`📧 [DEV] Teacher approved email would be sent to: ${email}`);
-        return { success: false, message: "SMTP not configured" };
-    }
+  if (!transporter) {
+    console.log(`📧 [DEV] Teacher approved email would be sent to: ${email}`);
+    return { success: false, message: "SMTP not configured" };
+  }
 
-    const loginUrl = `${process.env.APP_URL || "http://localhost:5173"}/dang-nhap`;
+  const loginUrl = `${process.env.APP_URL || "http://localhost:5173"}/dang-nhap`;
 
-    const mailOptions = {
-        from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
-        to: email,
-        subject: "✅ Tài khoản đã được phê duyệt - Music Collection",
-        html: getTeacherApprovedTemplate(name, loginUrl),
-        text: `
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: email,
+    subject: "✅ Tài khoản đã được phê duyệt - Music Collection",
+    html: getTeacherApprovedTemplate(name, loginUrl),
+    text: `
 Xin chào ${name},
 
 Chúc mừng! Tài khoản giáo viên của bạn đã được phê duyệt.
@@ -136,35 +136,35 @@ Bạn có thể đăng nhập ngay tại: ${loginUrl}
 Trân trọng,
 Music Collection Team
     `,
-    };
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Teacher approved email sent:", info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error("❌ Error sending teacher approved email:", error);
-        return { success: false, error: error.message };
-    }
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Teacher approved email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Error sending teacher approved email:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 /**
  * Gửi email thông báo tài khoản giáo viên bị từ chối
  */
 export const sendTeacherRejectedEmail = async (email, name, reason = "") => {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    if (!transporter) {
-        console.log(`📧 [DEV] Teacher rejected email would be sent to: ${email}`);
-        return { success: false, message: "SMTP not configured" };
-    }
+  if (!transporter) {
+    console.log(`📧 [DEV] Teacher rejected email would be sent to: ${email}`);
+    return { success: false, message: "SMTP not configured" };
+  }
 
-    const mailOptions = {
-        from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
-        to: email,
-        subject: "Thông báo về tài khoản - Music Collection",
-        html: getTeacherRejectedTemplate(name, reason),
-        text: `
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: email,
+    subject: "Thông báo về tài khoản - Music Collection",
+    html: getTeacherRejectedTemplate(name, reason),
+    text: `
 Xin chào ${name},
 
 Rất tiếc, tài khoản giáo viên của bạn chưa được phê duyệt.
@@ -176,22 +176,73 @@ Nếu bạn có thắc mắc, vui lòng liên hệ với chúng tôi.
 Trân trọng,
 Music Collection Team
     `,
-    };
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("✅ Teacher rejected email sent:", info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error("❌ Error sending teacher rejected email:", error);
-        return { success: false, error: error.message };
-    }
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Teacher rejected email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Error sending teacher rejected email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Gửi email thông báo cho admin khi có giảng viên đăng ký mới
+ */
+export const sendAdminNotificationEmail = async (teacherEmail, teacherName) => {
+  const transporter = createTransporter();
+
+  if (!transporter) {
+    console.log(`📧 [DEV] Admin notification email would be sent for teacher: ${teacherEmail}`);
+    return { success: false, message: "SMTP not configured" };
+  }
+
+  // Lấy email admin từ biến môi trường, mặc định là SMTP_USER nếu không có
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+
+  if (!adminEmail) {
+    console.warn("⚠️  No admin email configured. Skipping admin notification.");
+    return { success: false, message: "Admin email not configured" };
+  }
+
+  const approvalUrl = `${process.env.APP_URL || "http://localhost:5173"}/bang-dieu-khien/quan-ly-nguoi-dung`;
+
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME || "Music Collection"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: adminEmail,
+    subject: "🔔 Có giảng viên mới đăng ký - Music Collection",
+    html: getAdminNotificationTemplate(teacherName, teacherEmail, approvalUrl),
+    text: `
+Thông báo: Có giảng viên mới đăng ký
+
+Thông tin giảng viên:
+- Họ tên: ${teacherName}
+- Email: ${teacherEmail}
+
+Vui lòng vào hệ thống để phê duyệt tài khoản:
+${approvalUrl}
+
+Trân trọng,
+Music Collection System
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Admin notification email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Error sending admin notification email:", error);
+    return { success: false, error: error.message };
+  }
 };
 
 // ==================== EMAIL TEMPLATES ====================
 
 function getVerificationEmailTemplate(name, verificationUrl) {
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -266,7 +317,7 @@ function getVerificationEmailTemplate(name, verificationUrl) {
 }
 
 function getTeacherPendingTemplate(name) {
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -320,7 +371,7 @@ function getTeacherPendingTemplate(name) {
 }
 
 function getTeacherApprovedTemplate(name, loginUrl) {
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -378,7 +429,7 @@ function getTeacherApprovedTemplate(name, loginUrl) {
 }
 
 function getTeacherRejectedTemplate(name, reason) {
-    return `
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -431,3 +482,77 @@ function getTeacherRejectedTemplate(name, reason) {
 </html>
   `;
 }
+
+function getAdminNotificationTemplate(teacherName, teacherEmail, approvalUrl) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giảng viên mới đăng ký</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🔔 Giảng viên mới đăng ký</h1>
+            </td>
+          </tr>
+          
+          <tr>
+            <td style="padding: 40px 30px;">
+              <h2 style="color: #333333; margin: 0 0 20px 0;">Thông báo từ hệ thống</h2>
+              <p style="color: #666666; line-height: 1.6; margin: 0 0 20px 0;">
+                Có một giảng viên mới vừa đăng ký tài khoản và đang chờ phê duyệt.
+              </p>
+              
+              <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #333333; margin: 0 0 10px 0; font-size: 14px;">
+                  <strong style="color: #667eea;">👤 Họ tên:</strong> ${teacherName}
+                </p>
+                <p style="color: #333333; margin: 0; font-size: 14px;">
+                  <strong style="color: #667eea;">📧 Email:</strong> ${teacherEmail}
+                </p>
+              </div>
+              
+              <p style="color: #666666; line-height: 1.6; margin: 20px 0 30px 0;">
+                Vui lòng vào hệ thống để xem xét và phê duyệt tài khoản này.
+              </p>
+              
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="${approvalUrl}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                      Vào trang quản lý
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="color: #999999; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                Hoặc copy link sau vào trình duyệt:<br>
+                <a href="${approvalUrl}" style="color: #667eea; word-break: break-all;">${approvalUrl}</a>
+              </p>
+            </td>
+          </tr>
+          
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
+              <p style="color: #999999; font-size: 12px; margin: 0;">
+                © 2025 Music Collection. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+

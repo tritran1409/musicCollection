@@ -5,7 +5,8 @@ import { createCookie } from "react-router";
 import crypto from "crypto";
 import {
   sendVerificationEmail,
-  sendTeacherPendingEmail
+  sendTeacherPendingEmail,
+  sendAdminNotificationEmail
 } from "./email.server.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "super-secret-key";
@@ -63,6 +64,9 @@ export const register = async (email, password, name, role = "STUDENT") => {
     } else if (role === "TEACHER") {
       // Gửi email thông báo chờ duyệt cho giáo viên
       await sendTeacherPendingEmail(email, name);
+
+      // Gửi email thông báo cho admin về giảng viên mới
+      await sendAdminNotificationEmail(email, name);
     }
   } catch (emailError) {
     console.error("Email sending error:", emailError);

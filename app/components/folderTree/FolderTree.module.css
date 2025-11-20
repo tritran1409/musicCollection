@@ -30,7 +30,6 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  /* 4px */
   padding: 0.35rem 0.5rem;
   border-radius: 0.5rem;
   transition: all 0.2s;
@@ -110,4 +109,52 @@
 
 .itemContent.active .addButton:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Mobile (768px and below) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    position: relative;
+  }
+
+  .container {
+    padding: 0.75rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .itemContent {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .label {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small mobile (480px and below) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .itemContent {
+    padding: 0.35rem 0.4rem;
+  }
+
+  .label {
+    font-size: 0.85rem;
+  }
 }
