@@ -31,12 +31,10 @@ async function handleLessonFilter(formData, params) {
         const page = parseInt(formData.get("page")) || 1;
         const limit = parseInt(formData.get("limit")) || 20;
 
-        console.log('📊 Lesson Filter - Received filters:', filters);
 
         // Build where clause
         const whereClause = buildLessonWhereClause(filters, classId);
 
-        console.log('📊 Lesson Filter - Where clause:', JSON.stringify(whereClause, null, 2));
 
         // Parse sort
         const [sortField, sortOrder] = filters.sortBy.split("-");
@@ -60,12 +58,6 @@ async function handleLessonFilter(formData, params) {
                 },
             }
         );
-
-        console.log('📊 Lesson Filter - Query results:', {
-            total,
-            lessonsCount: lessons.length,
-            firstLesson: lessons[0]
-        });
 
         return {
             lessons,

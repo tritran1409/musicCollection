@@ -60,11 +60,7 @@ export default function useDocumentFilter(
   // 🔎 Gửi request filter lên server
   const filter = (filters, resetPage = true) => {
     if (!endpoint) return console.warn("No endpoint provided for filter");
-    console.log('🔍 LESSON filter() called with:', filters);
-    console.log('Current activeFilters:', activeFilters);
-    console.log('initialFilters:', initialFilters);
     const newFilters = { ...activeFilters, ...filters };
-    console.log(newFilters, initialFilters);
 
     // Nếu filter giống với initial -> trả về data gốc
     if (deepEqual(newFilters, initialFilters)) {
