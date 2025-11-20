@@ -228,7 +228,7 @@ export default function DocumentList({ loaderData }) {
                             >
                               👁️
                             </button>
-                            {(permissions.isAdmin || permissions.isManager || (permissions.isTeacher && selectedDocument.ownerId === permissions.userId)) && (
+                            {(permissions.isAdmin || permissions.isManager || (permissions.isTeacher && document.ownerId === permissions.userId)) && (
                               <><button
                                 className={`${styles.actionIcon} ${styles.editIcon}`}
                                 onClick={(e) => handleEditDocument(e, document.id)}

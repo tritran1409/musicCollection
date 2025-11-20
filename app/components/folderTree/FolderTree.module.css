@@ -1,9 +1,12 @@
 .sidebar {
   width: 300px;
-  height: 100vh;
+  height: calc(100vh - 60px);
   background-color: #ffffff;
   border-right: 1px solid #e5e7eb;
   overflow-y: auto;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 }
 
 .container {
@@ -26,7 +29,8 @@
 .itemContent {
   display: flex;
   align-items: center;
-  gap: 0.25rem; /* 4px */
+  gap: 0.25rem;
+  /* 4px */
   padding: 0.35rem 0.5rem;
   border-radius: 0.5rem;
   transition: all 0.2s;
