@@ -1,4 +1,4 @@
-/* DocumentPicker.module.css */
+/* DocumentPicker.module.css - FIXED VERSION */
 
 /* Wrapper cho button */
 .pickerWrapper {
@@ -179,21 +179,47 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Main content - 2 panels layout */
+/* ===== PHẦN SỬA ĐỂ LÀM STICKY ===== */
+
+/* Main content - scroll ở đây thay vì từng panel */
 .mainContent {
     display: flex;
     flex: 1;
-    overflow: hidden;
     min-height: 0;
+    overflow-y: auto;  /* THAY ĐỔI: scroll ở main thay vì panel */
+    overflow-x: hidden;
 }
 
-/* LEFT PANEL */
+/* LEFT PANEL - sticky khi scroll */
 .leftPanel {
     flex: 1;
     display: flex;
     flex-direction: column;
     border-right: 2px solid #e9ecef;
-    overflow: hidden;
+    position: sticky;  /* THÊM: làm sticky */
+    top: 0;            /* THÊM: dính vào top */
+    align-self: flex-start;  /* THÊM: căn về đầu */
+    height: fit-content;     /* THÊM: chiều cao vừa đủ */
+    max-height: calc(90vh - 100px);  /* THÊM: giới hạn chiều cao */
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* RIGHT PANEL - có thể dài hơn để scroll */
+.rightPanel {
+    width: 40%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #e9ecef;
+    /* BỎ: overflow hidden - để nội dung tự nhiên */
+}
+
+/* ===== HẾT PHẦN SỬA ===== */
+
+.rightPanel.hidden {
+    width: 0;
+    border: none;
 }
 
 .filterSection {
@@ -362,22 +388,6 @@
     font-weight: 500;
 }
 
-/* RIGHT PANEL - Detail */
-.rightPanel {
-    width: 40%;
-    background: #fff;
-    height: 100%;
-    overflow-y: auto;
-    border-left: 1px solid #eee;
-    position: relative;
-}
-
-
-.rightPanel.hidden {
-    width: 0;
-    border: none;
-}
-
 .detailHeader {
     display: flex;
     align-items: flex-start;
@@ -433,8 +443,8 @@
 
 .detailContent {
     flex: 1;
-    overflow-y: auto;
     padding: 20px;
+    /* BỎ overflow - để scroll tự nhiên ở main */
 }
 
 .detailSection {
@@ -605,6 +615,16 @@
     margin: 0;
 }
 
+.editDetailButton {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+
+.editDetailButton:hover {
+    background-color: #dbeafe;
+    transform: translateX(4px);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .rightPanel {
@@ -621,6 +641,7 @@
         border-right: none;
         border-bottom: 2px solid #e9ecef;
         max-height: 50vh;
+        position: static; /* BỎ sticky trên mobile */
     }
 
     .rightPanel {
@@ -665,14 +686,4 @@
     .documentTitle {
         font-size: 13px;
     }
-}
-
-.editDetailButton {
-    background-color: #eff6ff;
-    color: #1e40af;
-}
-
-.editDetailButton:hover {
-    background-color: #dbeafe;
-    transform: translateX(4px);
 }
