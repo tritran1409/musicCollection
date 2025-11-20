@@ -14,6 +14,8 @@ export default [
         route(`thong-tin-suu-tam/chinh-sua/:documentId`, "routes/document/documentEdit.jsx"),
         route(`thong-tin-suu-tam/xem/:documentId`, "routes/document/documentView.jsx"),
         route(`tim-kiem`, "routes/search.jsx"),
+        route(`tim-kiem-tai-lieu`, "routes/searchDoc.jsx"),
+        route(`tim-kiem-bai-giang`, "routes/searchLesson.jsx"),
         route(`chuong-trinh-hoc/bai-giang/create/:classId?`, "routes/dashboard/createLesson.jsx"),
         route(`chuong-trinh-hoc/bai-giang/edit/:lessonId`, "routes/dashboard/editLesson.jsx"),
         route("admin", "routes/admin.jsx"),
@@ -34,4 +36,5 @@ export default [
     route("api/document/pdf/:documentId", "routes/actions/exportPDF.jsx"),
     route("api/document/word/:documentId", "routes/actions/exportWord.jsx"),
     route("api/document/filter", "routes/actions/documentFilter.jsx"),
+    route("api/lesson/filter", "routes/actions/lessonFilter.jsx"),
 ] satisfies RouteConfig;

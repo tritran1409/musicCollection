@@ -20,13 +20,11 @@ export default function useDocumentFilter(
 
   const [activeFilters, setActiveFilters] = useState({
     searchText: initialFilters.searchText || "",
-    categoryId: initialFilters.categoryId || "",
     dateRange: initialFilters.dateRange || "all",
     dateFrom: initialFilters.dateFrom || "",
     dateTo: initialFilters.dateTo || "",
     sortBy: initialFilters.sortBy || "createdAt-desc",
     owner: initialFilters.owner || "",
-    tags: initialFilters.tags || [],
   });
 
   const [pagination, setPagination] = useState({
@@ -42,13 +40,11 @@ export default function useDocumentFilter(
     setData(initialData);
     setActiveFilters({
       searchText: initialFilters.searchText || "",
-      categoryId: initialFilters.categoryId || "",
       dateRange: initialFilters.dateRange || "all",
       dateFrom: initialFilters.dateFrom || "",
       dateTo: initialFilters.dateTo || "",
       sortBy: initialFilters.sortBy || "createdAt-desc",
       owner: initialFilters.owner || "",
-      tags: initialFilters.tags || [],
     });
     setPagination({ page: initialPage, limit: initialLimit });
   }, [key]);
@@ -64,7 +60,9 @@ export default function useDocumentFilter(
   // 🔎 Gửi request filter lên server
   const filter = (filters, resetPage = true) => {
     if (!endpoint) return console.warn("No endpoint provided for filter");
-
+    console.log('🔍 LESSON filter() called with:', filters);
+    console.log('Current activeFilters:', activeFilters);
+    console.log('initialFilters:', initialFilters);
     const newFilters = { ...activeFilters, ...filters };
     console.log(newFilters, initialFilters);
 
@@ -89,7 +87,6 @@ export default function useDocumentFilter(
         ...newFilters,
         page: newPagination.page,
         limit: newPagination.limit,
-        tags: JSON.stringify(newFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -110,7 +107,6 @@ export default function useDocumentFilter(
         ...activeFilters,
         page,
         limit: pagination.limit,
-        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -125,7 +121,6 @@ export default function useDocumentFilter(
         ...activeFilters,
         page: 1,
         limit,
-        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -146,13 +141,11 @@ export default function useDocumentFilter(
 
     const emptyFilters = {
       searchText: "",
-      categoryId: "",
       dateRange: "all",
       dateFrom: "",
       dateTo: "",
       sortBy: "createdAt-desc",
       owner: "",
-      tags: [],
     };
 
     if (deepEqual(activeFilters, emptyFilters)) return;
@@ -166,7 +159,6 @@ export default function useDocumentFilter(
         ...emptyFilters,
         page: 1,
         limit: pagination.limit,
-        tags: JSON.stringify([]),
       },
       { method: "post", action: endpoint }
     );
@@ -176,13 +168,11 @@ export default function useDocumentFilter(
   const hasActiveFilters = () => {
     const empty = {
       searchText: "",
-      categoryId: "",
       dateRange: "all",
       dateFrom: "",
       dateTo: "",
       sortBy: "createdAt-desc",
       owner: "",
-      tags: [],
     };
     return !deepEqual(activeFilters, empty);
   };
@@ -196,7 +186,6 @@ export default function useDocumentFilter(
         ...activeFilters,
         page: pagination.page,
         limit: pagination.limit,
-        tags: JSON.stringify(activeFilters.tags),
       },
       { method: "post", action: endpoint }
     );
@@ -213,12 +202,10 @@ export default function useDocumentFilter(
   const getActiveFilterCount = () => {
     let count = 0;
     if (activeFilters.searchText.trim()) count++;
-    if (activeFilters.categoryId) count++;
     if (activeFilters.dateRange !== "all") count++;
     if (activeFilters.dateFrom || activeFilters.dateTo) count++;
     if (activeFilters.sortBy !== "createdAt-desc") count++;
     if (activeFilters.owner) count++;
-    if (activeFilters.tags && activeFilters.tags.length > 0) count++;
     return count;
   };
 
@@ -231,7 +218,8 @@ export default function useDocumentFilter(
 
     // 📊 Data
     initData,
-    documents: data?.documents || [],
+    lessons: data?.lessons || [],
+    documents: data?.lessons || [],
     filtering: isLoading,
     error: data?.error || null,
 

@@ -1,42 +1,31 @@
-import FileLibraryLayout from "../components/common/FileLibraryLayout.jsx";
 import { DocumentModel } from "../.server/document.repo.js";
+import DocumentListView from "../components/documentList/DocumentListView.jsx";
 
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
-  const userName = url.searchParams.get("userName") || "";
+  const owner = url.searchParams.get("owner") || "";
 
   const documentModel = new DocumentModel();
-  const files = await fileModel.findAll();
+  const documents = await documentModel.findAll();
 
   return {
-    files: {
-      files,
-      total: files.length,
-      page: 1,
-      limit: 20,
-      totalPages: Math.ceil(files.length / 20),
-      hasNextPage: files.length > 20,
-      hasPreviousPage: false,
-      startIndex: 0,
-      endIndex: Math.min(20, files.length),
-    },
-    userName
+    documents,
+    owner
   };
 };
 
 export default function SearchDocument({ loaderData }) {
-  const { files, userName } = loaderData;
-  const pageName = `🔎 Tìm kiếm nâng cao`;
+  const { documents, owner } = loaderData;
 
   return (
-    <FileLibraryLayout
-      files={files}
-      fileType={"custom"}
-      accept={"*/*"}
-      pageName={pageName}
-      extraData={{
-        userName
-      }}
+    <DocumentListView
+      documents={documents}
+      categoryId={null}
+      disabledFilters={[]}
+      pageName="🔎 Tìm kiếm tài liệu"
+      showAddButton={false}
+      filterKey="search-document"
+      extraData={{ owner }}
     />
   );
 }

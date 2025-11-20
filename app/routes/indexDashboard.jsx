@@ -261,7 +261,7 @@ export default function IndexDashboard({ loaderData }) {
                                 </div>
                                 <button
                                     className={styles.myContentViewBtn}
-                                    onClick={() => navigate("/bang-dieu-khien/thong-tin-suu-tam")}
+                                    onClick={() => navigate("/bang-dieu-khien/tim-kiem-tai-lieu?owner=" + user.name)}
                                 >
                                     Xem →
                                 </button>

@@ -75,7 +75,7 @@ export class LessonModel extends BaseModel {
       },
       orderBy: { createdAt: "desc" },
     });
-    
+
     return this.populateFilesAndDocumentsForLessons(lessons);
   }
 
@@ -144,20 +144,49 @@ export class LessonModel extends BaseModel {
         .filter(Boolean),
     }));
   }
+  async findManyWithFilters(whereClause = {}, options = {}) {
+    const { skip, take, orderBy, include } = options;
 
-  async createLesson({ 
-    title, 
-    description, 
-    ownerId, 
-    classId, 
-    fileIds = [], 
-    documentIds = [] 
+    const [lessons, total] = await Promise.all([
+      this.model.findMany({
+        where: whereClause,
+        skip,
+        take,
+        orderBy,
+        include: include || {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.model.count({ where: whereClause }),
+    ]);
+
+    const populatedLessons = await this.populateFilesAndDocumentsForLessons(lessons);
+
+    return {
+      lessons: populatedLessons,
+      total,
+    };
+  }
+
+  async createLesson({
+    title,
+    description,
+    ownerId,
+    classId,
+    fileIds = [],
+    documentIds = []
   }) {
     // Validate owner exists
     const owner = await prisma.user.findUnique({
       where: { id: ownerId },
     });
-    
+
     if (!owner) throw new Error("User not found");
 
     // Validate files exist
@@ -165,7 +194,7 @@ export class LessonModel extends BaseModel {
       const filesCount = await prisma.file.count({
         where: { id: { in: fileIds } },
       });
-      
+
       if (filesCount !== fileIds.length) {
         throw new Error("Some files not found");
       }
@@ -176,7 +205,7 @@ export class LessonModel extends BaseModel {
       const documentsCount = await prisma.document.count({
         where: { id: { in: documentIds } },
       });
-      
+
       if (documentsCount !== documentIds.length) {
         throw new Error("Some documents not found");
       }
@@ -207,38 +236,38 @@ export class LessonModel extends BaseModel {
     return populatedLesson;
   }
 
-  async updateLesson(id, { 
-    title, 
-    description, 
-    ownerId, 
-    classId, 
-    fileIds, 
-    documentIds 
+  async updateLesson(id, {
+    title,
+    description,
+    ownerId,
+    classId,
+    fileIds,
+    documentIds
   }) {
     const data = {};
-    
+
     if (title !== undefined) data.title = title;
     if (description !== undefined) data.description = description;
     if (classId !== undefined) data.classId = classId;
-    
+
     if (ownerId) {
       const owner = await prisma.user.findUnique({
         where: { id: ownerId },
       });
-      
+
       if (!owner) throw new Error("User not found");
-      
+
       data.ownerId = ownerId;
       data.ownerName = owner.name;
     }
-    
+
     // Validate and update files
     if (fileIds !== undefined) {
       if (fileIds.length > 0) {
         const filesCount = await prisma.file.count({
           where: { id: { in: fileIds } },
         });
-        
+
         if (filesCount !== fileIds.length) {
           throw new Error("Some files not found");
         }
@@ -257,7 +286,7 @@ export class LessonModel extends BaseModel {
         const documentsCount = await prisma.document.count({
           where: { id: { in: documentIds } },
         });
-        
+
         if (documentsCount !== documentIds.length) {
           throw new Error("Some documents not found");
         }

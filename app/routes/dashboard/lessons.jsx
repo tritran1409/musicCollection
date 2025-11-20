@@ -8,6 +8,9 @@ import { useDocumentExport } from "../../hooks/useDownloadDoc";
 import { useFileDownload } from "../../hooks/useDownloadFile";
 import { useFetcherWithReset } from "../../hooks/useFetcherWithReset";
 import { usePermissions } from "../../hooks/usePermissions";
+import LessonFilter from "../../components/lessonFilter/LessonFilter";
+import useLessonFilter from "../../hooks/useLessonFilter";
+import Pagination from "../../components/pagination/Pagination";
 
 export async function loader({ params }) {
   const { classId } = params;
@@ -18,6 +21,40 @@ export async function loader({ params }) {
 
 export default function LessonList({ loaderData }) {
   const { classId, lessons } = loaderData;
+  const initialFilters = {
+    searchText: '',
+    dateRange: 'all',
+    dateFrom: '',
+    dateTo: '',
+    sortBy: 'createdAt-desc',
+    owner: '',
+  };
+
+  const {
+    documents: filteredLessons,
+    filtering,
+    filter,
+    resetFilters,
+    activeFilters,
+    hasActiveFilters,
+    activeFilterCount,
+    pagination,
+    goToPage,
+    nextPage,
+    previousPage,
+    changeLimit,
+  } = useLessonFilter(
+    { documents: lessons, total: lessons.length },
+    '/api/lesson/filter',
+    1,
+    20,
+    initialFilters,
+    `lesson-list-${classId}`
+  );
+
+  const handleReset = () => {
+    filter(initialFilters);
+  };
   const navigate = useNavigate();
   const fetcher = useFetcherWithReset();
   const { downloadFile, downloading } = useFileDownload();
@@ -330,8 +367,16 @@ export default function LessonList({ loaderData }) {
             </button>
           )}
         </div>
-
-        {lessons && lessons.length > 0 ? (
+        <LessonFilter
+          activeFilters={activeFilters}
+          onFilterChange={filter}
+          onReset={handleReset}
+          hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
+          isLoading={filtering}
+          disabledFilters={[]}
+        />
+        {filteredLessons && filteredLessons.length > 0 ? (
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <thead>
@@ -342,7 +387,7 @@ export default function LessonList({ loaderData }) {
                 </tr>
               </thead>
               <tbody>
-                {lessons.map((lesson) => {
+                {filteredLessons.map((lesson) => {
                   // prepare counts safely
                   const files = Array.isArray(lesson.files) ? lesson.files : [];
                   const documents = Array.isArray(lesson.documents) ? lesson.documents : [];
@@ -487,6 +532,22 @@ export default function LessonList({ loaderData }) {
                 })}
               </tbody>
             </table>
+            {pagination.totalPages > 1 && (
+              <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.total}
+                itemsPerPage={pagination.limit}
+                onPageChange={goToPage}
+                onLimitChange={changeLimit}
+                isLoading={filtering}
+                showLimitSelector={true}
+                showPageInfo={true}
+                showItemInfo={true}
+                limitOptions={[10, 20, 50, 100]}
+                maxPageButtons={5}
+              />
+            )}
           </div>
         ) : (
           <p>Không có bài giảng nào</p>

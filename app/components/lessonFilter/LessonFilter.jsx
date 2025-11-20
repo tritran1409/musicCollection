@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useCategories } from "../../context/CategoryContext";
-import styles from "./DocumentFilter.module.css";
+import styles from "./LessonFilter.module.css";
 
-export default function DocumentFilterAdvanced({
+export default function LessonFilter({
     activeFilters,
     onFilterChange = () => { },
     onReset = () => { },
@@ -18,28 +17,30 @@ export default function DocumentFilterAdvanced({
     const isFirstSearchRender = useRef(true);
     const isFirstOwnerRender = useRef(true);
 
-    const { customCategories } = useCategories();
-    const categoryTemps = customCategories.map((category) => {
-        if (category.rootPath === '/thong-tin-suu-tam') {
-            return {
-                value: category.id,
-                label: category.name,
-            };
-        }
-        return null;
-    }).filter((category) => category !== null);
-    const categories = [{ value: 'all', label: 'Tất cả' }, ...categoryTemps];
-
-    const isDisabled = (filter) => {
-        return isLoading || disabledFilters.includes(filter);
-    };
-
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
     };
 
     const handleOwnerChange = (e) => {
         setOwnerValue(e.target.value);
+    };
+
+    // Sync local state when activeFilters is reset (e.g. via Reset button)
+    useEffect(() => {
+        if (activeFilters.searchText === "" && searchValue !== "") {
+            setSearchValue("");
+        }
+        if (activeFilters.owner === "" && ownerValue !== "") {
+            setOwnerValue("");
+        }
+    }, [activeFilters]);
+
+    const isDisabled = (filter) => {
+        // Don't disable text inputs during loading to prevent focus loss
+        if (filter === 'searchText' || filter === 'owner') {
+            return disabledFilters.includes(filter);
+        }
+        return isLoading || disabledFilters.includes(filter);
     };
 
     useEffect(() => {
@@ -85,12 +86,10 @@ export default function DocumentFilterAdvanced({
     const checkActiveFilterCount = () => {
         let count = 0;
         if (activeFilters.searchText.trim() && !disabledFilters.includes('searchText')) count++;
-        if (activeFilters.category && !disabledFilters.includes('category')) count++;
         if (activeFilters.dateRange !== "all" && !disabledFilters.includes('dateRange')) count++;
         if (activeFilters.dateFrom || activeFilters.dateTo && !disabledFilters.includes('dateFrom') && !disabledFilters.includes('dateTo')) count++;
         if (activeFilters.sortBy !== "createdAt-desc" && !disabledFilters.includes('sortBy')) count++;
         if (activeFilters.owner && activeFilters.owner.trim() && !disabledFilters.includes('owner')) count++;
-        if (activeFilters.tags && activeFilters.tags.length > 0 && !disabledFilters.includes('tags')) count++;
         return count;
     };
 
@@ -113,9 +112,10 @@ export default function DocumentFilterAdvanced({
                         <input
                             type="text"
                             className={styles.searchInput}
-                            placeholder="Tìm kiếm tài liệu..."
+                            placeholder="Tìm kiếm bài giảng..."
                             value={searchValue}
                             onChange={handleSearchChange}
+                            ref={searchInputRef}
                         />
                         {activeFilters.searchText && (
                             <button
@@ -143,30 +143,13 @@ export default function DocumentFilterAdvanced({
             {isExpanded && (
                 <div className={styles.filterBody}>
                     <div className={styles.filterGrid}>
-                        {/* Loại tài liệu */}
-                        <div className={styles.filterGroup}>
-                            <label className={styles.filterLabel}>📑 Loại tài liệu</label>
-                            <select
-                                className={styles.filterSelect}
-                                value={activeFilters.categoryId || "all"}
-                                onChange={(e) => onFilterChange({ ...activeFilters, categoryId: e.target.value })}
-                                disabled={isDisabled('category')}
-                            >
-                                {categories.map((category) => (
-                                    <option key={category.value} value={category.value}>
-                                        {category.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
                         {/* Người sở hữu */}
                         <div className={styles.filterGroup}>
-                            <label className={styles.filterLabel}>👤 Người sở hữu</label>
+                            <label className={styles.filterLabel}>👤 Người tạo</label>
                             <input
                                 type="text"
                                 className={styles.filterSelect}
-                                placeholder="Nhập tên người sở hữu..."
+                                placeholder="Nhập tên người tạo..."
                                 value={ownerValue}
                                 onChange={handleOwnerChange}
                                 disabled={isDisabled('owner')}
