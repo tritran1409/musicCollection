@@ -370,7 +370,7 @@ export default function FileLibraryPage({ files, fileType = "raw", classMate = n
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
-              <ClassSelector selected={classes} onChange={setClasses} fixedClasses={classMate ? classes : null} />
+              <ClassSelector selected={classes} onChange={setClasses} fixedClasses={classMate ? [Number(classMate)] : null} />
               {error && <p className={styles.error}>{error}</p>}
               {data?.success && <p className={styles.success}>Tải lên thành công!</p>}
             </div>

@@ -461,17 +461,19 @@ export class DocumentModel extends BaseModel {
     let browser;
 
     try {
+      const isProduction = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
+
       browser = await puppeteer.launch({
-        args: isLocal
-          ? [
+        args: isProduction
+          ? chromium.args
+          : [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-          ]
-          : chromium.args,
-        executablePath: isLocal
-          ? getChromePath() // Tự động tìm Chrome
-          : await chromium.executablePath(),
+          ],
+        executablePath: isProduction
+          ? (process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser')  // ✅ Dùng system Chromium
+          : getChromePath(), // Tự động tìm Chrome trên local
         headless: true,
       });
 

@@ -6,6 +6,7 @@ export default function ClassSelector({ selected = [], onChange, fixedClasses = 
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef();
   const buttonRef = useRef();
+  const dropdownRef = useRef(); // Ref cho dropdown
   const [rect, setRect] = useState(null);
   const [dropUp, setDropUp] = useState(false);
 
@@ -22,7 +23,9 @@ export default function ClassSelector({ selected = [], onChange, fixedClasses = 
   }, [isOpen]);
   useEffect(() => {
     function handleClickOutside(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
+      // Kiểm tra xem click có nằm trong wrapper hoặc dropdown không
+      const clickedInside = ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target);
+      if (!clickedInside) {
         setIsOpen(false);
       }
     }
@@ -77,6 +80,7 @@ export default function ClassSelector({ selected = [], onChange, fixedClasses = 
       {isOpen && !fixedClasses && rect && !isDisabled && (
         <Portal>
           <div
+            ref={dropdownRef}
             className={styles.dropdown}
             style={{
               top: dropUp ? rect.top - 200 - 6 + window.scrollY : rect.bottom + 6 + window.scrollY,
