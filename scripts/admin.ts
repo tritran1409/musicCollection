@@ -1,6 +1,10 @@
 // prisma/seed.js
 import { PrismaClient } from '../generated/prisma/client';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -18,12 +22,13 @@ async function main() {
   }
 
   // Tạo tài khoản ADMIN mặc định
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@musiccollection.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'seven007';
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@musiccollection.com',
+      email: adminEmail,
       name: 'Administrator',
       role: 'ADMIN',
       status: 'ACTIVE',

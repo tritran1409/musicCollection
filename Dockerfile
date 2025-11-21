@@ -55,27 +55,27 @@ WORKDIR /app
 
 # 🔥 Install Chromium and required dependencies for Puppeteer
 RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    font-noto-emoji \
-    wqy-zenhei \
-    # Additional dependencies for better PDF rendering
-    fontconfig \
-    # Required for Puppeteer
-    udev \
-    ttf-opensans \
-    && fc-cache -f
+  chromium \
+  nss \
+  freetype \
+  freetype-dev \
+  harfbuzz \
+  ca-certificates \
+  ttf-freefont \
+  font-noto-emoji \
+  wqy-zenhei \
+  # Additional dependencies for better PDF rendering
+  fontconfig \
+  # Required for Puppeteer
+  udev \
+  ttf-opensans \
+  && fc-cache -f
 
 # 🔥 Environment variables for Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    CHROME_PATH=/usr/bin/chromium-browser \
-    NODE_ENV=production
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+  CHROME_PATH=/usr/bin/chromium-browser \
+  NODE_ENV=production
 
 # Copy package files
 COPY package.json package-lock.json ./
@@ -89,6 +89,9 @@ COPY --from=build-env /app/build ./build
 
 # Copy Prisma schema (needed for potential migrations)
 COPY --from=build-env /app/prisma ./prisma
+
+# Copy scripts directory (needed for admin creation)
+COPY --from=build-env /app/scripts ./scripts
 
 # Expose port (Railway will set PORT env variable)
 EXPOSE 3000
